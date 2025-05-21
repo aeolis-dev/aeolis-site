@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Jordan Hopper" />
+  <title>Jordan Hopper | Content Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1e1e2f;
+      --accent: #00ffd5;
+      --bg: #0f0f1a;
+      --text: #f1f1f1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    header {
+      padding: 4rem 2rem;
+      text-align: center;
+      animation: fadeIn 1s ease-out forwards;
+    }
+
+    h1 {
+      font-size: 3rem;
+      color: var(--accent);
+    }
+
+    h2 {
+      font-weight: 300;
+      color: #ccc;
+    }
+
+    .section {
+      padding: 4rem 2rem;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .project {
+      margin-bottom: 3rem;
+      animation: slideUp 0.8s ease-out;
+    }
+
+    .project-title {
+      font-size: 1.5rem;
+      color: var(--accent);
+    }
+
+    .project-description {
+      margin-top: 0.5rem;
+      color: #bbb;
+    }
+
+    footer {
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.875rem;
+      color: #666;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Jordan Hopper</h1>
+    <h2>Content Portal</h2>
+  </header>
+
+  <section class="section" id="projects">
+    <div class="project">
+      <div class="project-title">Placeholder 1</div>
+      <div class="project-description">Placeholder description</div>
+    </div>
+
+    <div class="project">
+      <div class="project-title">Placeholder 2</div>
+      <div class="project-description">Placeholder description</div>
+    </div>
+  </section>
+
+  <footer>
+    &copy; 2025 Jordan Hopper — <a href="mailto:jordan@aeolis.dev" style="color: var(--accent); text-decoration: none;">jordan@aeolis.dev</a>
+  </footer>
+
+  <script>
+    // Simple GSAP-like animation fallback (for lightweight control)
+    document.querySelectorAll('.project').forEach((el, i) => {
+      el.style.animationDelay = `${0.2 + i * 0.1}s`;
+    });
+  </script>
+</body>
+</html>
