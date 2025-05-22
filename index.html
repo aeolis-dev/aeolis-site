@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -46,6 +47,13 @@
       color: #ccc;
     }
 
+    footer {
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.875rem;
+      color: #666;
+    }
+
     .section {
       padding: 4rem 2rem;
       max-width: 900px;
@@ -67,24 +75,65 @@
       color: #bbb;
     }
 
-    footer {
-      padding: 2rem;
-      text-align: center;
-      font-size: 0.875rem;
-      color: #666;
+    .project-title {
+      font-size: 1.5rem;
+      color: var(--accent);
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .project-title::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -75%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transform: skewX(-20deg);
+    }
+
+    .project-title:hover::after {
+      animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+      0% {
+        left: -75%;
+      }
+
+      100% {
+        left: 125%;
+      }
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
+
 <body>
   <header>
     <h1>Jordan Hopper</h1>
@@ -104,14 +153,15 @@
   </section>
 
   <footer>
-    &copy; 2025 Jordan Hopper — <a href="mailto:jordan@aeolis.dev" style="color: var(--accent); text-decoration: none;">jordan@aeolis.dev</a>
+    &copy; 2025 Jordan Hopper — <a href="mailto:jordan@aeolis.dev"
+      style="color: var(--accent); text-decoration: none;">jordan@aeolis.dev</a>
   </footer>
 
   <script>
-    // Simple GSAP-like animation fallback (for lightweight control)
     document.querySelectorAll('.project').forEach((el, i) => {
       el.style.animationDelay = `${0.2 + i * 0.1}s`;
     });
   </script>
 </body>
+
 </html>
