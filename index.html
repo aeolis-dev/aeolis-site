@@ -23,12 +23,24 @@
       padding: 0;
     }
 
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+
     body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       font-family: 'Inter', sans-serif;
       background: var(--bg);
       color: var(--text);
       line-height: 1.6;
       overflow-x: hidden;
+    }
+
+    .content {
+      flex: 1 0 auto;
     }
 
     header {
@@ -47,13 +59,6 @@
       color: #ccc;
     }
 
-    footer {
-      padding: 2rem;
-      text-align: center;
-      font-size: 0.875rem;
-      color: #666;
-    }
-
     .section {
       padding: 4rem 2rem;
       max-width: 900px;
@@ -68,19 +73,14 @@
     .project-title {
       font-size: 1.5rem;
       color: var(--accent);
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
     }
 
     .project-description {
       margin-top: 0.5rem;
       color: #bbb;
-    }
-
-    .project-title {
-      font-size: 1.5rem;
-      color: var(--accent);
-      position: relative;
-      overflow: hidden;
-      display: inline-block;
     }
 
     .project-title::after {
@@ -98,14 +98,12 @@
       animation: shimmer 1.5s infinite;
     }
 
-    @keyframes shimmer {
-      0% {
-        left: -75%;
-      }
-
-      100% {
-        left: 125%;
-      }
+    footer {
+      flex-shrink: 0;
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.875rem;
+      color: #666;
     }
 
     @keyframes fadeIn {
@@ -113,7 +111,6 @@
         opacity: 0;
         transform: translateY(-20px);
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
@@ -125,32 +122,42 @@
         opacity: 0;
         transform: translateY(20px);
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        left: -75%;
+      }
+      100% {
+        left: 125%;
       }
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <h1>Jordan Hopper</h1>
-    <h2>Content Portal</h2>
-  </header>
+  <div class="content">
+    <header>
+      <h1>Jordan Hopper</h1>
+      <h2>Content Portal</h2>
+    </header>
 
-  <section class="section" id="projects">
-    <div class="project">
-      <div class="project-title">Placeholder 1</div>
-      <div class="project-description">Placeholder description</div>
-    </div>
+    <section class="section" id="projects">
+      <div class="project">
+        <div class="project-title">Placeholder 1</div>
+        <div class="project-description">Placeholder description</div>
+      </div>
 
-    <div class="project">
-      <div class="project-title">Placeholder 2</div>
-      <div class="project-description">Placeholder description</div>
-    </div>
-  </section>
+      <div class="project">
+        <div class="project-title">Placeholder 2</div>
+        <div class="project-description">Placeholder description</div>
+      </div>
+    </section>
+  </div>
 
   <footer>
     &copy; 2025 Jordan Hopper — <a href="mailto:jordan@aeolis.dev"
