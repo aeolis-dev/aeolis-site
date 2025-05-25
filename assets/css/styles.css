@@ -2,7 +2,6 @@
    1. FONT IMPORTS & GLOBAL VARIABLES
    ========================================================================== */
 
-/* Google Fonts import for Space Mono - a monospace font that fits the futuristic theme */
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
 
 /* Global variables for consistent theming */
@@ -14,7 +13,7 @@
   --text: #ffffff;
   --grid-angle: 45deg;  /* Angle for diagonal grid patterns */
   --noise-opacity: 0.03;
-  --glitch-intensity: 8px;  /* Controls the strength of glitch offset effects */
+  --glitch-offset-strength: 8px;  /* Controls the magnitude of glitch offset effects */
 }
 
 /* ==========================================================================
@@ -25,7 +24,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased; /* Improves text rendering on some displays */
 }
 
 html, body {
@@ -41,8 +40,8 @@ body {
   background-color: var(--primary);
   color: var(--text);
   line-height: 1.6;
-  overflow-x: hidden;
-  position: relative;
+  overflow-x: hidden; /* Prevents horizontal scrolling */
+  position: relative; /* For positioning pseudo-elements like overlays */
 }
 
 /* ==========================================================================
@@ -51,44 +50,44 @@ body {
 
 /* Main content wrapper */
 .content {
-  flex: 1 0 auto;
+  flex: 1 0 auto; /* Allows footer to stick to bottom */
   position: relative;
   padding: 0 1rem;
   max-width: 1400px;
-  margin: 0 auto;
+  margin: 0 auto; /* Centers content on larger screens */
   width: 100%;
 }
 
 header {
-  padding: 4rem 0;
+  padding: 2rem 0;
   position: relative;
 }
 
 footer {
-  flex-shrink: 0;
+  flex-shrink: 0; /* Prevents footer from shrinking if content is too tall */
   padding: 2rem;
   text-align: center;
   font-size: 0.7rem;
   color: var(--text);
-  opacity: 1;
+  opacity: 1; /* Fully opaque */
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  border-top: 1px solid rgba(91, 10, 10, 0.294);
+  border-top: 1px solid rgba(91, 10, 10, 0.294); /* Subtle top border */
   position: relative;
   background: linear-gradient(
     180deg,
     var(--secondary) 0%,
     var(--primary) 100%
   );
-  transform: translateZ(0);
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
-  z-index: 2;
+  transform: translateZ(0); /* Promotes to its own compositing layer for performance */
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3); /* Shadow above the footer */
+  z-index: 2; /* Ensures footer is above background elements */
 }
 
 footer div.local-glitch-text[data-text] {
   position: relative; 
-  display: block; /* Make it a block element to take full width */
-  margin-top: 0.5em; /* Add some space above */
+  display: block;
+  margin-top: 0.5em;
   width: 100%;
   text-align: center;
 }
@@ -98,8 +97,7 @@ footer div.local-glitch-text[data-text] {
   display: grid;
   grid-template-columns: repeat(2, minmax(150px, 300px));
   gap: 2rem;
-  margin-top: 2rem;
-  perspective: 1000px; /* TODO: Mess around with this */
+  perspective: 1000px; /* TODO: Mess around with this. Adds 3D perspective to child elements. */
 }
 
 /* ==========================================================================
@@ -112,17 +110,17 @@ h1 {
   color: var(--accent);
   font-family: 'Space Mono', monospace;
   text-transform: uppercase;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.03em; /* Tightens spacing */
   line-height: 0.9;
   margin-bottom: 1rem;
   position: relative;
   font-weight: 700;
-  mix-blend-mode: difference;
-  transform: perspective(500px) rotateX(5deg);
+  mix-blend-mode: difference; /* Inverts colors where it overlaps elements behind it */
+  transform: perspective(500px) rotateX(5deg); /* Slight 3D tilt */
   animation-name: titleGlitch;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
-  /* animation-duration will be set by JS */
+  /* animation-duration is set by JavaScript for variability */
 }
 
 /* Subtitle styling (h2) */
@@ -130,19 +128,19 @@ h2 {
   font-weight: 300;
   color: var(--text);
   text-transform: uppercase;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.3em; /* Wider spacing */
   font-size: 0.8rem;
   opacity: 0.7;
   margin-left: 5px;
   position: relative;
-  display: inline-block;
+  display: inline-block; /* Allows padding and keeps it inline */
   padding-left: 15px;
   padding-right: 15px;
 }
 
 /* Span inside h2 for local glitch text */
 h2 span.local-glitch-text {
-  display: inline-block;
+  display: inline-block; /* Necessary for transform and some layout properties if used */
   position: relative;
 }
 
@@ -160,38 +158,38 @@ h2 span.local-glitch-text {
     rgba(26, 26, 26, 0.8) 100%
   );
   padding: 2rem;
-  transition: all 0.3s ease;
-  overflow: hidden;
-  transform: translateZ(0) rotateX(2deg);
-  transform-style: preserve-3d;
+  transition: all 0.3s ease; /* Smooth transition for hover effects */
+  overflow: hidden; /* Clips content like the hover bar animation */
+  transform: translateZ(0) rotateX(2deg); /* Slight 3D tilt */
+  transform-style: preserve-3d; /* Children also respect 3D transformations */
   box-shadow: 
-    0 15px 25px rgba(0, 0, 0, 0.4),
-    0 0 20px rgba(255, 0, 102, 0.1);
+    0 15px 25px rgba(0, 0, 0, 0.4), /* Main shadow for depth */
+    0 0 20px rgba(255, 0, 102, 0.1); /* Subtle accent glow */
   display: flex;
-  flex-direction: column;
-  min-height: 200px; /* Ensure consistent minimum height */
+  flex-direction: column; /* Stacks title and description vertically */
+  height: 200px; /* Fixed height. Was min-height. */
 }
 
 .project:hover {
   box-shadow: 
-    0 20px 35px rgba(0, 0, 0, 0.5),
-    0 0 30px rgba(255, 0, 102, 0.2),
-    inset 0 0 30px rgba(255, 0, 102, 0.1);
-  border-color: rgba(255, 0, 102, 0.3);
+    0 20px 35px rgba(0, 0, 0, 0.5), /* Enhanced shadow on hover */
+    0 0 30px rgba(255, 0, 102, 0.2), /* Brighter accent glow */
+    inset 0 0 30px rgba(255, 0, 102, 0.1); /* Inner accent glow */
+  border-color: rgba(255, 0, 102, 0.3); /* Accent-colored border on hover */
 }
 
 .project-title {
   font-size: 1.2rem;
-  color: var(--accent2); /* Base color before hover */
+  color: var(--accent2); /* Base color (cyan) */
   position: relative;
   margin-bottom: 1rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  display: inline-block;
-  text-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
-  transform: translateZ(10px);
-  transition: color 0.3s ease-out; /* Base transition for project title color specifically */
+  display: inline-block; /* To contain text-shadow and allow transform */
+  text-shadow: 0 0 10px rgba(0, 255, 204, 0.3); /* Subtle glow matching accent2 */
+  transform: translateZ(10px); /* Lifts title slightly in 3D space */
+  transition: color 0.3s ease-out; /* Smooth color transition, e.g., for hover bar text color change */
 }
 
 .project-number {
@@ -202,9 +200,9 @@ h2 span.local-glitch-text {
   color: var(--accent);
   opacity: 0.7;
   font-family: monospace;
-  text-shadow: 0 0 8px rgba(255, 0, 102, 0.4);
-  transform: translateZ(5px);
-  animation: none !important; /* Ensure no external animations affect this, check if this is necessary? */
+  text-shadow: 0 0 8px rgba(255, 0, 102, 0.4); /* Accent glow */
+  transform: translateZ(5px); /* Lifts number slightly in 3D space */
+  animation: none !important; /* Ensure no other animations interfere. Check if !important is truly necessary. */
 }
 
 .project-description {
@@ -212,9 +210,9 @@ h2 span.local-glitch-text {
   opacity: 0.8;
   font-size: 0.9rem;
   position: relative;
-  transform: translateZ(5px);
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  margin-top: auto; /* Push description to bottom if box is taller */
+  transform: translateZ(5px); /* Lifts description slightly in 3D space */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Subtle drop shadow for readability */
+  margin-top: 1rem; /* Spacing below title. Was 'auto'. */
 }
 
 /* ==========================================================================
@@ -224,27 +222,27 @@ h2 span.local-glitch-text {
 /* Diagonal grid background effect for body */
 body::before {
   content: '';
-  position: fixed;
+  position: fixed; /* Fixed to viewport */
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background-image: 
-    repeating-linear-gradient(
+    repeating-linear-gradient( /* First set of diagonal lines */
       var(--grid-angle),
       rgba(255, 255, 255, var(--noise-opacity)) 0px,
-      rgba(255, 255, 255, var(--noise-opacity)) 1px,
+      rgba(255, 255, 255, var(--noise-opacity)) 1px, /* Thin 1px line */
       transparent 1px,
-      transparent 20px
+      transparent 20px /* Space between lines */
     ),
-    repeating-linear-gradient(
+    repeating-linear-gradient( /* Second set of lines, perpendicular to first */
       calc(var(--grid-angle) + 90deg),
       rgba(255, 255, 255, var(--noise-opacity)) 0px,
       rgba(255, 255, 255, var(--noise-opacity)) 1px,
       transparent 1px,
       transparent 20px
     );
-  z-index: -1;
+  z-index: -1; /* Places grid behind all content */
 }
 
 /* CRT screen noise effect overlay for body */
@@ -478,7 +476,8 @@ h2 { /* h2 itself, not the span, for base display properties */
    ========================================================================== */
 
 /* Footer links base style - before Glitch Bar Fill effect */
-footer a { /* This selector is less specific than a.local-glitch-text, applies general footer link styling */
+footer a,
+footer span.local-glitch-text { /* This selector is less specific than a.local-glitch-text, applies general footer link styling */
   color: var(--accent);
   text-decoration: none;
   margin: 0 1rem;
