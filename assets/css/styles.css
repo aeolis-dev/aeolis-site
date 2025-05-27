@@ -154,8 +154,8 @@ h2 span.local-glitch-text {
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: linear-gradient(
     145deg,
-    var(--secondary) 0%,
-    rgba(26, 26, 26, 0.8) 100%
+    rgba(26, 26, 26, 0.6) 0%, /* Make background partially transparent */
+    rgba(26, 26, 26, 0.3) 100%
   );
   padding: 2rem;
   transition: all 0.3s ease; /* Smooth transition for hover effects */
@@ -168,6 +168,8 @@ h2 span.local-glitch-text {
   display: flex;
   flex-direction: column; /* Stacks title and description vertically */
   height: 200px; /* Fixed height. Was min-height. */
+  backdrop-filter: blur(10px); /* Add blur effect to content behind the element */
+  -webkit-backdrop-filter: blur(10px); /* Safari support */
 }
 
 .project:hover {
@@ -497,7 +499,7 @@ a.local-glitch-text,
 }
 
 /* The background bar pseudo-element */
-/* TODO: Not super fond of the styling/animation, try other things, also the accent should not be cyan */
+/* TODO: Not super fond of the styling/animation, try other things */
 a.local-glitch-text::after,
 .project-title.local-glitch-text::after {
   content: '';
