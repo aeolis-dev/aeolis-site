@@ -144,6 +144,12 @@ h2 span.local-glitch-text {
   position: relative;
 }
 
+/* Style for the link inside h2 */
+h2 a {
+  color: var(--accent2); /* Set link color to accent2 */
+  text-decoration: none; /* Remove underline */
+}
+
 /* ==========================================================================
    5. COMPONENT STYLES (Projects, Cards, etc.)
    ========================================================================== */
