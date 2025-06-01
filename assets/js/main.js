@@ -105,4 +105,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // Note: The local glitch effect is primarily activated by mouse movement.
   // For an effect on page load without mouse interaction, a more complex solution
   // (e.g., manually triggering a check after a timeout) might be needed.
-}); 
+});
+
+const aeolisTitle = document.getElementById('project-title-3');
+
+if (aeolisTitle) {
+  const originalText = aeolisTitle.textContent.trim();
+  const originalDataText = aeolisTitle.getAttribute('data-text');
+  const hoverText = 'YOU ARE HERE';
+
+  aeolisTitle.addEventListener('mouseover', () => {
+    aeolisTitle.textContent = hoverText;
+    aeolisTitle.setAttribute('data-text', hoverText);
+    // Optional: trigger glitch animation class if needed
+    // aeolisTitle.classList.add('glitch-active');
+  });
+
+  aeolisTitle.addEventListener('mouseout', () => {
+    aeolisTitle.textContent = originalText;
+    aeolisTitle.setAttribute('data-text', originalDataText);
+    // Optional: remove glitch animation class if needed
+    // aeolisTitle.classList.remove('glitch-active');
+  });
+} 
