@@ -1,723 +1,725 @@
+/* TODO: Increase contrast of elements */
+/* TODO: Fix footer and page size */
+/* TODO: Make graphics more maximalist */
+/* TODO: Give elements more transparency */
+/* TODO: Add hovering glitch effect back in */
 /* ==========================================================================
    1. FONT IMPORTS & GLOBAL VARIABLES
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap');
 
-/* Global variables for consistent theming */
+/* Maximalist Cyberdystopian Technical Theming */
 :root {
-  --primary: #000000;
-  --secondary: #1a1a1a;
-  --accent: #ff0066; 
-  --accent2: #00ffcc;
-  --text: #ffffff;
-  --grid-angle: 45deg;  /* Angle for diagonal grid patterns */
-  --noise-opacity: 0.03;
-  --glitch-offset-strength: 8px;  /* Controls the magnitude of glitch offset effects */
+  --bg-primary: #05080A;
+  --bg-secondary: #0A0F14;
+  --bg-tertiary: #101A20;
+  
+  --accent-primary: #00FFDD;  /* Teal/Cyan - Primary Action & Glow */
+  --accent-secondary: #FF0066; /* Magenta - Secondary Highlight & Warning */
+  --accent-tertiary: #FFAA00;  /* Orange - Tertiary Info & Status */
+  --accent-quaternary: #8800FF; /* Purple - Deep Glow & Background Elements */
+
+  --text-primary: #E0E0E0;
+  --text-secondary: #A0A0A0;
+  --text-highlight: var(--accent-primary);
+  --text-technical: #C0C0C0; /* For micro-text, data readouts */
+
+  --border-primary: rgba(0, 255, 221, 0.2);
+  --border-secondary: rgba(255, 255, 255, 0.1);
+  --border-accent: var(--accent-primary);
+
+  --font-main: 'Rajdhani', 'Orbitron', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --perspective-strong: 1000px;
+  --perspective-moderate: 1500px;
+
+  --glitch-hue1: 0deg; /* Red shift for magenta */
+  --glitch-hue2: 180deg; /* Cyan shift */
+  
+  --scanline-opacity: 0.03;
+  --noise-opacity: 0.02;
+  --grid-opacity: 0.05;
+
+  --animation-speed-fast: 0.2s;
+  --animation-speed-medium: 0.4s;
+  --animation-speed-slow: 0.8s;
 }
 
 /* ==========================================================================
    2. RESETS & BASE STYLES
    ========================================================================== */
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  -webkit-font-smoothing: antialiased; /* Improves text rendering on some displays */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html, body {
   height: 100%;
   margin: 0;
+  overflow-x: hidden;
 }
 
 body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: 'Inter', sans-serif;
-  background-color: var(--primary);
-  color: var(--text);
+  font-family: var(--font-mono);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   line-height: 1.6;
-  overflow-x: hidden; /* Prevents horizontal scrolling */
-  position: relative; /* For positioning pseudo-elements like overlays */
+  position: relative;
+  perspective: var(--perspective-moderate);
+}
+
+/* --- Layered Background Effects --- */
+body::before { /* Deep Background Grid */
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(var(--accent-quaternary) 1px, transparent 1px),
+    linear-gradient(to right, var(--accent-quaternary) 1px, transparent 1px);
+  background-size: 100px 100px;
+  opacity: 0.03;
+  animation: bgGridPulse 20s linear infinite alternate;
+  z-index: 1;
+  pointer-events: none;
+}
+
+body::after { /* Subtle Noise Overlay */
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: var(--noise-opacity);
+  animation: noiseShift 5s steps(10) infinite;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.scanline-overlay {
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 255, 221, var(--scanline-opacity)) 3px,
+    rgba(0, 255, 221, var(--scanline-opacity)) 5px
+  );
+  animation: scanlinesMove 15s linear infinite;
+  z-index: 2;
+  pointer-events: none;
 }
 
 /* ==========================================================================
-   3. LAYOUT & PAGE STRUCTURE
+   3. FLOATING BACKGROUND TITLE (MAIN IDENTITY)
    ========================================================================== */
 
-/* Main content wrapper */
-.content {
-  flex: 1 0 auto; /* Allows footer to stick to bottom */
-  position: relative;
-  padding: 0 1rem;
-  max-width: 1400px;
-  margin: 0 auto; /* Centers content on larger screens */
-  width: 100%;
+.floating-title {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate3d(-50%, -50%, -300px) rotateX(25deg) rotateY(-15deg) skew(-5deg, -2deg);
+  font-family: var(--font-main);
+  font-size: clamp(10rem, 30vw, 35rem); /* Increased size */
+  font-weight: 900;
+  color: transparent;
+  background-image: linear-gradient(
+    110deg,
+    rgba(0, 255, 221, 0.15) 10%,
+    rgba(255, 0, 102, 0.1) 40%,
+    rgba(136, 0, 255, 0.15) 70%,
+    rgba(0, 255, 221, 0.05) 90%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  z-index: 5; /* Behind content but above deep background */
+  pointer-events: none;
+  animation: titleDrift 20s ease-in-out infinite alternate, titleColorCycle 30s linear infinite;
+  text-shadow: 
+    0 0 15px rgba(0, 255, 221, 0.1),
+    0 0 30px rgba(0, 255, 221, 0.05),
+    0 0 60px rgba(136, 0, 255, 0.1);
+  letter-spacing: -0.02em;
+  user-select: none;
+  filter: blur(1px) brightness(1.2);
+  opacity: 0.7;
 }
+
+/* ==========================================================================
+   4. LAYOUT & PAGE STRUCTURE
+   ========================================================================== */
+
+.content {
+  flex: 1 0 auto;
+  position: relative;
+  padding: 4rem 3rem;
+  max-width: 1920px;
+  margin: 0 auto;
+  width: 100%;
+  z-index: 10;
+  display: flex;
+  gap: 3rem;
+  align-items: flex-start;
+}
+
+.main-area {
+  flex: 2; /* Give more space to main content */
+  max-width: 1000px;
+  position: relative;
+}
+
+.visual-area {
+  flex: 1;
+  min-width: 400px;
+  max-width: 600px;
+  height: calc(100vh - 8rem); /* Full viewport height minus padding */
+  max-height: 800px;
+  position: sticky; /* Sticky to scroll alongside content */
+  top: 4rem;
+  transform-style: preserve-3d;
+}
+
+.dynamic-visual {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border: 2px solid var(--border-primary);
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: rgba(10, 15, 20, 0.8);
+  backdrop-filter: blur(25px) saturate(1.2);
+  transition: all var(--animation-speed-medium) cubic-bezier(0.165, 0.84, 0.44, 1);
+  box-shadow: 0 0 20px rgba(0, 255, 221, 0.1), 0 0 40px rgba(0, 0, 0, 0.5);
+  transform: translateZ(0);
+}
+
+.dynamic-visual::before, /* Pattern Layer */
+.dynamic-visual::after  /* Info Text Layer */
+{
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity var(--animation-speed-medium) ease, transform var(--animation-speed-medium) ease;
+}
+
+.dynamic-visual::after {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--text-highlight);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  opacity: 0.5;
+  content: '[SYSTEM STATUS: IDLE]';
+  text-shadow: 0 0 10px var(--accent-primary);
+  background: radial-gradient(circle, rgba(0,255,221,0.05) 0%, transparent 70%);
+}
+
+/* --- Visual Area States (complex patterns and animations) --- */
+/* Base styling is in main.js, these are class-specific overrides */
+.dynamic-visual.attackvector::before {
+  background: repeating-linear-gradient(45deg, rgba(255,0,102,0.1) 0, rgba(255,0,102,0.1) 2px, transparent 2px, transparent 10px),
+              repeating-linear-gradient(-45deg, rgba(255,0,102,0.1) 0, rgba(255,0,102,0.1) 2px, transparent 2px, transparent 10px);
+  animation: targetAcquired 10s linear infinite alternate;
+}
+.dynamic-visual.attackvector::after { content: '[UNREAL ENGINE UTILISATION]'; color: var(--accent-secondary); text-shadow: 0 0 10px var(--accent-secondary); }
+
+.dynamic-visual.reptify::before {
+  background-image: radial-gradient(var(--accent-primary) 1px, transparent 0);
+  background-size: 20px 20px;
+  animation: pulseGrid 5s ease-in-out infinite;
+}
+.dynamic-visual.reptify::after { content: '[MOVEMENT OPTIMISATION]'; }
+
+.dynamic-visual.megaherb::before {
+  background: repeating-radial-gradient(circle, var(--accent-tertiary) 0, var(--accent-tertiary) 2px, transparent 2px, transparent 20px);
+  animation: soundwaveRipple 3s linear infinite;
+}
+.dynamic-visual.megaherb::after { content: '[AUDIO EXPERIMENTATION]'; color: var(--accent-tertiary); text-shadow: 0 0 10px var(--accent-tertiary); }
+
+.dynamic-visual.aeolis::before {
+  background: repeating-conic-gradient(var(--accent-quaternary) 0% 5%, transparent 5% 20%);
+  animation: dataCoreSpin 15s linear infinite;
+}
+.dynamic-visual.aeolis::after { content: '[AEOLIS.DEV ONLINE]'; color: var(--accent-quaternary); text-shadow: 0 0 10px var(--accent-quaternary); }
+
+.dynamic-visual.contact::before {
+  background: linear-gradient(45deg, rgba(0,255,221,.1) 25%, transparent 25%, transparent 50%, rgba(0,255,221,.1) 50%, rgba(0,255,221,.1) 75%, transparent 75%, transparent),
+              linear-gradient(45deg, rgba(0,255,221,.1) 25%, transparent 25%, transparent 50%, rgba(0,255,221,.1) 50%, rgba(0,255,221,.1) 75%, transparent 75%, transparent);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+  animation: connectionLines 2s linear infinite;
+}
+.dynamic-visual.contact::after { content: '[UPLINK_ESTABLISHED]'; }
 
 header {
-  padding: 2rem 0;
+  margin-bottom: 4rem;
   position: relative;
 }
 
-footer {
-  flex-shrink: 0; /* Prevents footer from shrinking if content is too tall */
-  padding: 2rem;
-  text-align: center;
-  font-size: 0.7rem;
-  color: var(--text);
-  opacity: 1; /* Fully opaque */
-  letter-spacing: 0.2em;
+/* ==========================================================================
+   5. TYPOGRAPHY & HEADINGS
+   ========================================================================== */
+
+h2 { /* Main page subtitle */
+  font-family: var(--font-main);
+  font-weight: 700;
+  color: var(--text-primary);
   text-transform: uppercase;
-  border-top: 1px solid rgba(91, 10, 10, 0.294); /* Subtle top border */
+  letter-spacing: 0.1em;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
   position: relative;
-  background: linear-gradient(
-    180deg,
-    var(--secondary) 0%,
-    var(--primary) 100%
-  );
-  transform: translateZ(0); /* Promotes to its own compositing layer for performance */
-  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3); /* Shadow above the footer */
-  z-index: 2; /* Ensures footer is above background elements */
+  text-shadow: 0 0 10px rgba(0, 255, 221, 0.3), 1px 1px 0 rgba(0,0,0,0.5);
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
 }
 
-footer div.local-glitch-text[data-text] {
-  position: relative; 
-  display: block;
-  margin-top: 0.5em;
-  width: 100%;
-  text-align: center;
+h2::before { /* Decorative bracket/line */
+  content: '//';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent-primary);
+  font-size: 1.2em;
+  font-weight: 900;
+  opacity: 0.7;
 }
 
-/* Project grid layout */
+h2 a {
+  color: var(--accent-secondary);
+  text-decoration: none;
+  transition: all var(--animation-speed-fast) ease;
+  position: relative;
+}
+
+h2 a:hover {
+  color: var(--text-highlight);
+  text-shadow: 0 0 15px var(--text-highlight);
+}
+
+/* ==========================================================================
+   6. PROJECT COMPONENTS
+   ========================================================================== */
+
 .project-container {
   display: grid;
-  grid-template-columns: repeat(2, minmax(150px, 300px));
-  gap: 2rem;
-  perspective: 1000px; /* TODO: Mess around with this. Adds 3D perspective to child elements. */
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2.5rem;
+  perspective: var(--perspective-strong);
 }
 
-/* ==========================================================================
-   4. TYPOGRAPHY
-   ========================================================================== */
-
-/* Main title styling (h1) */
-h1 {
-  font-size: 6rem;
-  color: var(--accent);
-  font-family: 'Space Mono', monospace;
-  text-transform: uppercase;
-  letter-spacing: -0.03em; /* Tightens spacing */
-  line-height: 0.9;
-  margin-bottom: 1rem;
-  position: relative;
-  font-weight: 700;
-  mix-blend-mode: difference; /* Inverts colors where it overlaps elements behind it */
-  transform: perspective(500px) rotateX(5deg); /* Slight 3D tilt */
-  animation-name: titleGlitch;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-  /* animation-duration is set by JavaScript for variability */
-}
-
-/* Subtitle styling (h2) */
-h2 {
-  font-weight: 300;
-  color: var(--text);
-  text-transform: uppercase;
-  letter-spacing: 0.3em; /* Wider spacing */
-  font-size: 0.8rem;
-  opacity: 0.7;
-  margin-left: 5px;
-  position: relative;
-  display: inline-block; /* Allows padding and keeps it inline */
-  padding-left: 15px;
-  padding-right: 15px;
-}
-
-/* Span inside h2 for local glitch text */
-h2 span.local-glitch-text {
-  display: inline-block; /* Necessary for transform and some layout properties if used */
-  position: relative;
-}
-
-/* Style for the link inside h2 */
-h2 a {
-  color: var(--accent2); /* Set link color to accent2 */
-  text-decoration: none; /* Remove underline */
-}
-
-/* ==========================================================================
-   5. COMPONENT STYLES (Projects, Cards, etc.)
-   ========================================================================== */
-
-/* Individual project card styling */
 .project {
   position: relative;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: linear-gradient(
-    145deg,
-    rgba(26, 26, 26, 0.6) 0%, /* Make background partially transparent */
-    rgba(26, 26, 26, 0.3) 100%
-  );
+  border: 1px solid var(--border-secondary);
+  background: linear-gradient(145deg, var(--bg-secondary), var(--bg-tertiary));
   padding: 2rem;
-  transition: all 0.3s ease; /* Smooth transition for hover effects */
-  overflow: hidden; /* Clips content like the hover bar animation */
-  transform: translateZ(0) rotateX(2deg); /* Slight 3D tilt */
-  transform-style: preserve-3d; /* Children also respect 3D transformations */
-  box-shadow: 
-    0 15px 25px rgba(0, 0, 0, 0.4), /* Main shadow for depth */
-    0 0 20px rgba(255, 0, 102, 0.1); /* Subtle accent glow */
-  display: flex;
-  flex-direction: column; /* Stacks title and description vertically */
-  height: 200px; /* Fixed height. Was min-height. */
-  backdrop-filter: blur(10px); /* Add blur effect to content behind the element */
-  -webkit-backdrop-filter: blur(10px); /* Safari support */
+  transition: all var(--animation-speed-medium) cubic-bezier(0.075, 0.82, 0.165, 1);
+  transform-style: preserve-3d;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(0,255,221,0.05);
+  min-height: 250px;
+  backdrop-filter: blur(10px) brightness(1.1);
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  transform: translateZ(0);
 }
 
 .project:hover {
-  box-shadow: 
-    0 20px 35px rgba(0, 0, 0, 0.5), /* Enhanced shadow on hover */
-    0 0 30px rgba(255, 0, 102, 0.2), /* Brighter accent glow */
-    inset 0 0 30px rgba(255, 0, 102, 0.1); /* Inner accent glow */
-  border-color: rgba(255, 0, 102, 0.3); /* Accent-colored border on hover */
+  transform: translateZ(50px) rotateX(-2deg) rotateY(1deg) scale(1.03);
+  box-shadow: 0 25px 50px rgba(0,0,0,0.7), 
+              0 0 30px var(--accent-primary), 
+              inset 0 0 15px rgba(0,255,221,0.1);
+  border-color: var(--border-accent);
 }
 
-.project-title {
-  font-size: 1.2rem;
-  color: var(--accent2); /* Base color (cyan) */
-  position: relative;
-  margin-bottom: 1rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  display: inline-block; /* To contain text-shadow and allow transform */
-  text-shadow: 0 0 10px rgba(0, 255, 204, 0.3); /* Subtle glow matching accent2 */
-  transform: translateZ(10px); /* Lifts title slightly in 3D space */
-  transition: color 0.3s ease-out; /* Smooth color transition, e.g., for hover bar text color change */
-}
-
-.project-number {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 0.7rem;
-  color: var(--accent);
-  opacity: 0.7;
-  font-family: monospace;
-  text-shadow: 0 0 8px rgba(255, 0, 102, 0.4); /* Accent glow */
-  transform: translateZ(5px); /* Lifts number slightly in 3D space */
-  animation: none !important; /* Ensure no other animations interfere. Check if !important is truly necessary. */
-}
-
-.project-description {
-  color: var(--text);
-  opacity: 0.8;
-  font-size: 0.9rem;
-  position: relative;
-  transform: translateZ(5px); /* Lifts description slightly in 3D space */
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Subtle drop shadow for readability */
-  margin-top: 1rem; /* Spacing below title. Was 'auto'. */
-}
-
-/* ==========================================================================
-   6. DECORATIVE EFFECTS & OVERLAYS
-   ========================================================================== */
-
-/* Diagonal grid background effect for body */
-body::before {
-  content: '';
-  position: fixed; /* Fixed to viewport */
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    repeating-linear-gradient( /* First set of diagonal lines */
-      var(--grid-angle),
-      rgba(255, 255, 255, var(--noise-opacity)) 0px,
-      rgba(255, 255, 255, var(--noise-opacity)) 1px, /* Thin 1px line */
-      transparent 1px,
-      transparent 20px /* Space between lines */
-    ),
-    repeating-linear-gradient( /* Second set of lines, perpendicular to first */
-      calc(var(--grid-angle) + 90deg),
-      rgba(255, 255, 255, var(--noise-opacity)) 0px,
-      rgba(255, 255, 255, var(--noise-opacity)) 1px,
-      transparent 1px,
-      transparent 20px
-    );
-  z-index: -1; /* Places grid behind all content */
-}
-
-/* CRT screen noise effect overlay for body */
-/* TODO: Try other effects, but I like this one */
-body::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  opacity: 0.02;
-  pointer-events: none;
-  z-index: 100; /* High z-index to be on top of most things */
-}
-
-/* Diagonal gradient behind header */
-header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -50%;
-  width: 200%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%);
-  opacity: 0.1;
-  transform: skewY(-5deg);
-  z-index: -1;
-}
-
-/* Decorative angular elements */
-.diagonal-box {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 40%;
-  height: 100%;
-  background-color: var(--accent);
-  clip-path: polygon(100% 0, 0 0, 100% 100%);
-  opacity: 0.03;
-  z-index: -1;
-}
-
-.angular-element {
-  position: absolute;
-  background-color: var(--accent2);
-  z-index: -1;
-}
-
-.angular-element-1 {
-  top: 20%;
-  left: 10%;
-  width: 100px;
-  height: 10px;
-  transform: rotate(var(--grid-angle));
-}
-
-.angular-element-2 {
-  bottom: 30%;
-  right: 20%;
-  width: 150px;
-  height: 15px;
-  transform: rotate(calc(var(--grid-angle) * -1));
-}
-
-/* Decorative brackets for h2 subtitle */
-h2::before {
-  content: '[';
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-
-h2::after {
-  content: ']';
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-
-/* Animated highlight bar for project cards on hover */
-/* TODO: Not fond of the scrolling animation, try other things */
+/* Project Hover Glitch Scanline */
 .project::before {
   content: '';
   position: absolute;
   top: 0;
-  left: 0;
+  left: -100%;
   width: 100%;
-  height: 5px;
-  background: var(--accent);
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,255,221,0.15) 50%, transparent);
+  animation: projectScan var(--animation-speed-slow) cubic-bezier(0.23, 1, 0.32, 1) infinite paused;
+  z-index: 1;
   opacity: 0;
-  transform: scaleX(1); /* Keep it scaled, but fade it in */
-  transform-origin: left;
-  transition: opacity 0.3s ease; /* Check between opacity and transform, maybe try other options */
-  box-shadow: 0 0 15px rgba(255, 0, 102, 0.4);
+  transition: opacity var(--animation-speed-fast) ease;
 }
 
 .project:hover::before {
-  opacity: 1; /* Fade in on hover */
+  animation-play-state: running;
+  opacity: 1;
 }
 
-/* Decorative line above footer */
-footer::before {
+.project-number {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-technical);
+  background: rgba(0,255,221,0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid var(--border-primary);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  z-index: 3;
+  text-shadow: none;
+}
+
+.project-title {
+  font-family: var(--font-main);
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  color: var(--text-primary);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 2;
+  transition: color var(--animation-speed-fast) ease;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+}
+
+.project:hover .project-title {
+  color: var(--text-highlight);
+}
+
+.project-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.project-description {
+  font-family: var(--font-mono);
+  font-size: clamp(0.85rem, 2vw, 0.95rem);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  position: relative;
+  z-index: 2;
+  font-weight: 400;
+}
+
+/* Decorative corner elements for projects */
+.project::after {
   content: '';
   position: absolute;
-  top: -20px;
+  width: 20px;
+  height: 20px;
+  border-style: solid;
+  border-color: var(--border-primary);
+  opacity: 0.5;
+  transition: all var(--animation-speed-medium) ease;
+}
+
+.project::after { /* Top-left corner */
+  top: -2px;
+  left: -2px;
+  border-width: 2px 0 0 2px;
+}
+
+.project:hover::after {
+  border-color: var(--accent-primary);
+  opacity: 1;
+  width: 30px;
+  height: 30px;
+}
+
+/* Could add more corners with different pseudo-elements or multiple background images if needed */
+
+/* ==========================================================================
+   7. ENHANCED GLITCH EFFECTS
+   ========================================================================== */
+
+.local-glitch-text {
+  position: relative;
+  display: inline-block;
+  transform-style: preserve-3d; /* For 3D glitch */
+}
+
+.local-glitch-text::before,
+.local-glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-primary); /* Match background to hide original text of pseudo */
+  color: var(--accent-secondary);
+  overflow: hidden;
+  clip-path: inset(0% 0% 0% 0%); /* Full visibility initially */
+  opacity: 0;
+  transform-origin: center center;
+}
+
+.local-glitch-text::before { /* Magenta Layer */
+  animation: glitchAnim1 6s infinite alternate steps(2, jump-none);
+  transform: translate3d(-2px, -1px, -5px) skewX(-5deg);
+  text-shadow: 2px 2px var(--accent-primary);
+}
+
+.local-glitch-text::after { /* Cyan Layer */
+  color: var(--accent-primary);
+  animation: glitchAnim2 5s infinite alternate-reverse steps(2, jump-none);
+  transform: translate3d(2px, 1px, -3px) skewX(5deg);
+  text-shadow: -2px -2px var(--accent-secondary);
+}
+
+.project:hover .local-glitch-text::before,
+.project:hover .local-glitch-text::after {
+  animation-duration: 0.1s;
+  animation-iteration-count: 10; /* Short burst on hover */
+}
+
+/* ==========================================================================
+   8. FOOTER
+   ========================================================================== */
+
+footer {
+  flex-shrink: 0;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border-top: 1px solid var(--border-secondary);
+  position: relative;
+  background: linear-gradient(to top, var(--bg-primary), var(--bg-secondary));
+  z-index: 15;
+  backdrop-filter: blur(15px);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+footer::before { /* Top decorative line */
+  content: '';
+  position: absolute;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 100px;
+  width: 50%;
   height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--accent),
-    transparent
-  );
-  box-shadow: 0 0 15px var(--accent);
+  background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+  opacity: 0.3;
 }
 
-/* CRT scanlines effect */
-.glitch-scanlines {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    to bottom,
-    transparent 50%,
-    rgba(0, 0, 0, 0.25) 50%
-  );
-  background-size: 100% 3px;
-  z-index: 999; /* Below body::after noise, but above most content, check if this is correct? */
-  pointer-events: none;
-  opacity: 0.5;
-  animation: scanAnimation 0.07s infinite;
-  mix-blend-mode: overlay;
-}
-
-/* Chromatic aberration for h1 title */
-/* TODO: Change the title, font, etc. */
-h1::before,
-h1::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  mix-blend-mode: screen;
-  pointer-events: none;
-}
-
-h1::before { /* Red/pink offset layer */
-  color: #ff00de;
-  left: -1px;
-  opacity: 0.6;
-  animation: glitchLeft 8.3s infinite;
-  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
-}
-
-h1::after { /* Blue/cyan offset layer */
-  color: #00ffff;
-  left: 1px;
-  opacity: 0.5;
-  animation: glitchRight 8.3s infinite;
-  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
-  z-index: 1;
-}
-
-/* ==========================================================================
-   7. LOCALIZED GLITCH AURA EFFECT (JavaScript controlled)
-   ========================================================================== */
-
-/* Base for elements with local glitch aura */
-.local-glitch-text {
-  position: relative; 
-  --mask-size: 75px; /* Diameter of the aura */
-}
-
-/* The ::before pseudo-element creates the masked glitch text */
-/* TODO: See how much is possible without JS */
-.local-glitch-text::before {
-  content: attr(data-text);
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none; 
-  color: transparent; /* Original text of pseudo-element is transparent */
-  text-shadow: /* Glitch colors appear via text-shadow */
-    -1px -1px 0 var(--accent), /* Pink */
-    1px 1px 0 var(--accent2);  /* Cyan */
-  mask-image: radial-gradient(circle calc(var(--mask-size) / 2) at var(--mask-x, -9999px) var(--mask-y, -9999px), black 100%, transparent 101%);
-  mask-repeat: no-repeat;
-  animation-play-state: paused; /* Controlled by JS */
-  animation-name: textGlitch, sharpGlitch; 
-  animation-duration: 0.2s, 1.2s; 
-  animation-timing-function: ease-in-out, steps(1); 
-  animation-delay: 0s, 0.05s; 
-  animation-iteration-count: infinite, infinite;
-  animation-direction: alternate, normal;
-}
-
-.local-glitch-text.glitch-active::before {
-  animation-play-state: running; 
-}
-
-/* Ensure original text content is layered correctly if needed, though ::before is transparent */
-.local-glitch-text > *:not(::before) {
-  position: relative;
-  z-index: 1; /* May not be strictly necessary with transparent ::before */
-}
-
-/* Base styling for elements that will have the .local-glitch-text class */
-/* Ensures position:relative for the ::before pseudo-element placement and consistent layout. */
-/* TODO: Check if this is all necessary */
-.project-title, /* Already has .local-glitch-text if used */
-.project-description,
-footer a, /* Already has .local-glitch-text if used */
-h2 { /* h2 itself, not the span, for base display properties */
-  position: relative; 
-  display: inline-block; 
-}
-
-
-/* ==========================================================================
-   8. LINK & INTERACTIVE ELEMENT STYLES (Glitch Bar Fill Hover)
-   ========================================================================== */
-
-/* Footer links base style - before Glitch Bar Fill effect */
-footer a,
-footer span.local-glitch-text { /* This selector is less specific than a.local-glitch-text, applies general footer link styling */
-  color: var(--accent);
+footer a {
+  color: var(--text-secondary);
   text-decoration: none;
-  margin: 0 1rem;
-  text-shadow: 0 0 8px rgba(255, 0, 102, 0.4);
+  margin: 0 1.5rem;
+  transition: all var(--animation-speed-fast) ease;
+  position: relative;
+  padding: 0.5rem 0;
 }
 
-/* --- GENERALIZED Glitch Bar Fill Hover Effect --- */
-/* Applied to actual <a> tags with .local-glitch-text and .project-title elements */
-
-/* Base style for elements getting the glitch bar fill hover */
-a.local-glitch-text,
-.project-title.local-glitch-text { /* .project-title already has .local-glitch-text by default */
-  position: relative; /* Ensures proper positioning for ::after */
-  transition: color 0.2s 0.1s ease-out; /* Delay text color change slightly */
-  text-decoration: none; /* Ensure no default underline */
-  cursor: pointer; /* Indicate interactivity */
+footer a:hover {
+  color: var(--text-highlight);
+  text-shadow: 0 0 10px var(--text-highlight);
 }
 
-/* The background bar pseudo-element */
-/* TODO: Not super fond of the styling/animation, try other things */
-a.local-glitch-text::after,
-.project-title.local-glitch-text::after {
+footer a::after { /* Underline hover effect */
   content: '';
   position: absolute;
-  top: -0.1em; 
-  left: -0.3em;
-  width: calc(100% + 0.6em); 
-  height: calc(100% + 0.2em); 
-  background-color: var(--accent); /* Changed from accent2 to accent, try other colours too */
-  background-image: linear-gradient(
-    45deg, 
-    rgba(0,0,0,0.05) 25%, 
-    transparent 25%, 
-    transparent 50%, 
-    rgba(0,0,0,0.05) 50%, 
-    rgba(0,0,0,0.05) 75%, 
-    transparent 75%, 
-    transparent
-  );
-  background-size: 6px 6px; /* Small repeating pattern for texture */
-  z-index: -1; /* Place bar behind the text */
-  opacity: 0;
-  transform: scaleX(0);
-  transform-origin: left; 
-  transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.2s ease-out;
-  border-radius: 2px; /* Slight radius for aesthetics */
-  pointer-events: none; /* Ensure the pseudo-element doesn't intercept mouse events */
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: var(--text-highlight);
+  transition: width var(--animation-speed-medium) cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-/* Hover state for the main element - text color change */
-a.local-glitch-text:hover,
-.project-title.local-glitch-text:hover {
-   color: var(--primary) !important; /* Make text dark (black) to contrast with cyan bar */
+footer a:hover::after {
+  width: 100%;
 }
 
-/* Hover state for the background bar pseudo-element - bar animation */
-/* TODO: Try animated effects?? */
-a.local-glitch-text:hover::after,
-.project-title.local-glitch-text:hover::after {
-  opacity: 1; /* Show background bar */
-  transform: scaleX(1);
+footer .local-glitch-text[data-text*="JORDAN"] {
+  display: block;
+  margin-top: 1rem;
+  opacity: 0.7;
 }
 
 /* ==========================================================================
-   9. ANIMATIONS (Keyframes)
+   9. ANIMATIONS
    ========================================================================== */
 
-/* For main title's chromatic aberration layers */
-@keyframes glitchLeft {
-  0% { transform: translate(0, 0); }
-  93.7% { transform: translate(0, 0); }
-  93.8% { transform: translate(-15px, 2px); }
-  93.9% { transform: translate(4px, -2px); }
-  94.0% { transform: translate(0, 0); }
-  94.9% { transform: translate(0, 0); }
-  95.0% { transform: translate(3px, -1px); }
-  95.1% { transform: translate(-4px, 2px); }
-  95.2% { transform: translate(0, 0); }
-  99.7% { transform: translate(0, 0); }
-  99.8% { transform: translate(-3px, -2px); }
-  99.9% { transform: translate(2px, 1px); }
-  100% { transform: translate(0, 0); }
+@keyframes titleDrift {
+  0% { transform: translate3d(-50%, -50%, -300px) rotateX(25deg) rotateY(-15deg) skew(-5deg, -2deg); opacity: 0.6; }
+  100% { transform: translate3d(-50.5%, -50.5%, -320px) rotateX(23deg) rotateY(-17deg) skew(-4deg, -3deg); opacity: 0.8; }
 }
 
-@keyframes glitchRight {
-  0% { transform: translate(0, 0); }
-  93.7% { transform: translate(0, 0); }
-  93.8% { transform: translate(5px, -2px); }
-  93.9% { transform: translate(-4px, 2px); }
-  94.0% { transform: translate(0, 0); }
-  94.9% { transform: translate(0, 0); }
-  95.0% { transform: translate(-3px, 1px); }
-  95.1% { transform: translate(4px, -2px); }
-  95.2% { transform: translate(0, 0); }
-  99.7% { transform: translate(0, 0); }
-  99.8% { transform: translate(3px, 2px); }
-  99.9% { transform: translate(-8px, -10px); }
-  100% { transform: translate(0, 0); }
+@keyframes titleColorCycle {
+  0% { filter: blur(1px) brightness(1.2) hue-rotate(0deg); }
+  100% { filter: blur(1px) brightness(1.2) hue-rotate(360deg); }
 }
 
-/* For main title's primary glitch text-shadow and scale */
-@keyframes titleGlitch {
-  0% {
-    text-shadow: -1px 1px 0 rgba(255, 0, 222, 0.6), 1px -1px 0 rgba(0, 255, 255, 0.6);
-    transform: perspective(500px) rotateX(5deg) scale(1);
-  }
-  25% {
-    text-shadow: 1px -1px 0 rgba(255, 0, 222, 0.6), 1px -1px 0 rgba(0, 255, 255, 0.6);
-  }
-  50% {
-    text-shadow: 1px -1px 0 rgba(255, 0, 222, 0.6), -1px 1px 0 rgba(0, 255, 255, 0.6);
-    transform: perspective(500px) rotateX(5deg) scale(1.01);
-  }
-  75% {
-    text-shadow:  1px -1px 0 rgba(255, 0, 222, 0.6), -1px -0px 0 rgba(0, 255, 255, 0.6);
-  }
-  100% {
-    text-shadow: -1px 1px 0 rgba(255, 0, 222, 0.6), 1px -1px 0 rgba(0, 255, 255, 0.6);
-    transform: perspective(500px) rotateX(5deg) scale(1);
-  }
+@keyframes bgGridPulse {
+  0% { opacity: 0.02; transform: scale(1); }
+  50% { opacity: 0.05; transform: scale(1.02); }
+  100% { opacity: 0.02; transform: scale(1); }
 }
 
-/* For local glitch aura effect */
-@keyframes textGlitch {
-  0% {
-    transform: translate(0);
-    text-shadow: 
-      -1px -1px 0 var(--accent),
-      1px 1px 0 var(--accent2);
-  }
-  20% {
-    transform: translate(-2px, 1px);
-    text-shadow: 
-      1px -1px 0 var(--accent),
-      -1px 1px 0 var(--accent2);
-  }
-  40% {
-    transform: translate(2px, -1px);
-    text-shadow: 
-      2px 1px 0 var(--accent),
-      -1px -1px 0 var(--accent2);
-  }
-  60% {
-    transform: translate(-1px, 2px);
-    text-shadow: 
-      -1px 1px 0 var(--accent),
-      1px -1px 0 var(--accent2);
-  }
-  80% {
-    transform: translate(1px, -2px);
-    text-shadow: 
-      1px 1px 0 var(--accent),
-      -1px -1px 0 var(--accent2);
-  }
-  100% {
-    transform: translate(0);
-    text-shadow: 
-      -1px -1px 0 var(--accent),
-      1px 1px 0 var(--accent2);
-  }
+@keyframes noiseShift {
+  0%, 100% { transform: translate(0,0); }
+  25% { transform: translate(2px, -3px); }
+  50% { transform: translate(-1px, 2px); }
+  75% { transform: translate(3px, 1px); }
 }
 
-@keyframes sharpGlitch { /* Also for local glitch aura */
-  0%, 100% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
-  5% { transform: translate(2px, -1px); clip-path: inset(10% 0 85% 0); }
-  6% { transform: translate(-2px, 1px); clip-path: inset(90% 0 5% 0); }
-  10% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
-  20% { transform: translate(-3px, 2px); clip-path: inset(0 80% 70% 0); }
-  21% { transform: translate(3px, -2px); clip-path: inset(60% 10% 0 0); }
-  25% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
-  40% { transform: translate(1px, 3px); clip-path: inset(50% 0 0 40%); }
-  41% { transform: translate(-1px, -3px); clip-path: inset(0 30% 40% 0); }
-  45% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
-  60% { transform: translate(4px, -2px); clip-path: inset(20% 50% 50% 0); }
-  61% { transform: translate(-4px, 2px); clip-path: inset(55% 0 25% 50%); }
-  65% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
-  80% { transform: translate(-2px, -3px); clip-path: inset(0 0 70% 60%); }
-  81% { transform: translate(2px, 3px); clip-path: inset(75% 65% 0 0); }
-  85% { transform: translate(0, 0); clip-path: inset(0 0 0 0); }
-}
-
-/* For scanlines subtle vibration */
-@keyframes scanAnimation {
+@keyframes scanlinesMove {
   0% { transform: translateY(0); }
-  50% { transform: translateY(1px); }
-  100% { transform: translateY(0); }
+  100% { transform: translateY(50px); }
+}
+
+@keyframes targetAcquired {
+  0% { transform: scale(1) rotate(0deg); opacity: 0.2; }
+  50% { transform: scale(1.1) rotate(5deg); opacity: 0.4; }
+  100% { transform: scale(1) rotate(0deg); opacity: 0.2; }
+}
+
+@keyframes pulseGrid {
+  0%, 100% { background-size: 20px 20px; opacity: 0.3; }
+  50% { background-size: 25px 25px; opacity: 0.6; }
+}
+
+@keyframes soundwaveRipple {
+  0% { transform: scale(1); opacity: 0.2; }
+  50% { transform: scale(1.2); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 0.2; }
+}
+
+@keyframes dataCoreSpin {
+  0% { transform: rotate(0deg); opacity: 0.4; }
+  100% { transform: rotate(360deg); opacity: 0.2; }
+}
+
+@keyframes connectionLines {
+  0% { background-position: 0 0, 15px 15px; }
+  100% { background-position: 30px 30px, 45px 45px; }
+}
+
+@keyframes projectScan {
+  0% { left: -100%; }
+  50% { left: 0; }
+  100% { left: 100%; }
+}
+
+@keyframes glitchAnim1 {
+  0% { clip-path: inset(10% 0 80% 0); transform: translate3d(-2px, -1px, -5px) skewX(-5deg); opacity: 0.8; }
+  25% { clip-path: inset(40% 0 30% 0); transform: translate3d(1px, 2px, -4px) skewX(2deg); opacity: 0.6; }
+  50% { clip-path: inset(75% 0 5% 0); transform: translate3d(-1px, -2px, -6px) skewX(-3deg); opacity: 0.9; }
+  75% { clip-path: inset(5% 0 60% 0); transform: translate3d(2px, 1px, -3px) skewX(4deg); opacity: 0.7; }
+  100% { clip-path: inset(50% 0 20% 0); transform: translate3d(0px, 0px, -5px) skewX(0deg); opacity: 0.5; }
+}
+
+@keyframes glitchAnim2 {
+  0% { clip-path: inset(85% 0 5% 0); transform: translate3d(2px, 1px, -3px) skewX(5deg); opacity: 0.7; }
+  25% { clip-path: inset(15% 0 70% 0); transform: translate3d(-1px, -2px, -2px) skewX(-2deg); opacity: 0.9; }
+  50% { clip-path: inset(30% 0 40% 0); transform: translate3d(1px, 2px, -4px) skewX(3deg); opacity: 0.6; }
+  75% { clip-path: inset(65% 0 10% 0); transform: translate3d(-2px, -1px, -1px) skewX(-4deg); opacity: 0.8; }
+  100% { clip-path: inset(20% 0 55% 0); transform: translate3d(0px, 0px, -3px) skewX(0deg); opacity: 0.5; }
 }
 
 /* ==========================================================================
    10. RESPONSIVE DESIGN
    ========================================================================== */
 
-/* TODO: Test mobile etc. */
+@media (max-width: 1200px) {
+  .content {
+    flex-direction: column;
+    padding: 3rem 2rem;
+  }
+  
+  .visual-area {
+    width: 100%;
+    max-width: none;
+    height: 400px; /* Adjust height for column layout */
+    position: relative; /* No longer sticky in column layout */
+    top: auto;
+  }
+
+  .floating-title {
+    font-size: clamp(8rem, 25vw, 25rem);
+  }
+}
+
 @media (max-width: 768px) {
-  h1 {
-    font-size: 4rem;
+  .content {
+    padding: 2rem 1rem;
+  }
+
+  .main-area {
+    flex-basis: 100%;
   }
   
   .project-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Single column for projects */
+    gap: 2rem;
+  }
+  
+  .project {
+    min-height: 220px;
+    padding: 1.5rem;
+  }
+  
+  h2 {
+    font-size: clamp(1.2rem, 3.5vw, 1.8rem);
   }
 
-  /* Adjust subtitle padding for smaller screens if needed */
-  h2 {
-    letter-spacing: 0.2em;
-    font-size: 0.7rem;
+  .floating-title {
+    font-size: clamp(6rem, 20vw, 20rem);
+    transform: translate3d(-50%, -50%, -200px) rotateX(15deg) rotateY(-10deg) skew(-3deg, -1deg);
+  }
+  
+  footer {
+    padding: 2rem 1rem;
+    letter-spacing: 0.15em;
   }
 }
 
 @media (max-width: 480px) {
-  h1 {
-    font-size: 3rem;
-  }
-  
-  header {
-    padding: 3rem 0;
-  }
-
   .project {
-    padding: 1.5rem;
+    padding: 1.2rem;
+    min-height: 200px;
   }
 
   .project-title {
-    font-size: 1rem;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
   }
 
   .project-description {
-    font-size: 0.8rem;
+    font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+  }
+  
+  h2 {
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    padding-left: 1rem;
   }
 
-  footer {
-    padding: 1.5rem;
-    font-size: 0.6rem;
+  h2::before {
+    font-size: 1em;
+  }
+
+  .floating-title {
+    font-size: clamp(5rem, 18vw, 15rem);
   }
 } 

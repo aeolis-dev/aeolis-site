@@ -1,3 +1,4 @@
+<!-- TODO: Fix contact page -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -13,27 +14,33 @@
 </head>
 
 <body>
+  <div class="scanline-overlay"></div>
+  <div class="floating-title">JORDAN</div>
   <div class="glitch-scanlines"></div>
+  
   <div class="content">
-    <div class="diagonal-box"></div>
-    
-    <header>
-      <h1 data-text="ABOUT">ABOUT</h1>
-      <h2><span class="local-glitch-text" data-text="Get in Touch">Get in Touch</span></h2>
-    </header>
+    <div class="main-area">
+      <header>
+        <h2><span class="local-glitch-text" data-text="Get in Touch">Get in Touch</span></h2>
+      </header>
 
-    <section class="section" id="contact">
-      <div class="project-container">
-        <div class="project">
-          <div class="project-number">#000</div>
-          <div class="project-title local-glitch-text" data-text="CONTACT">CONTACT</div>
-          <div class="project-description">
-            <a href="mailto:jordan@aeolis.dev" class="local-glitch-text" data-text="jordan@aeolis.dev" style="text-decoration: none; color: inherit;">jordan@aeolis.dev</a>
-            <p id="phone-number-placeholder" class="local-glitch-text" data-text=""></p> 
+      <section class="section" id="contact">
+        <div class="project-container">
+          <div class="project" data-visual="contact">
+            <div class="project-number">#000</div>
+            <div class="project-title local-glitch-text" data-text="CONTACT">CONTACT</div>
+            <div class="project-description">
+              <a href="mailto:jordan@aeolis.dev" class="local-glitch-text" data-text="jordan@aeolis.dev" style="text-decoration: none; color: inherit;">jordan@aeolis.dev</a>
+              <p id="phone-number-placeholder" class="local-glitch-text" data-text=""></p> 
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
+
+    <div class="visual-area">
+      <div class="dynamic-visual" id="dynamic-visual"></div>
+    </div>
   </div>
 
   <footer>

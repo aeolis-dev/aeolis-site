@@ -13,59 +13,65 @@
 </head>
 
 <body>
+  <div class="scanline-overlay"></div>
+  <div class="floating-title">ATTACKVECTOR</div>
   <div class="glitch-scanlines"></div>
+  
   <div class="content">
-    <div class="diagonal-box"></div>
+    <div class="main-area">
+      <header>
+        <h2><a href="index.html"><span class="local-glitch-text" data-text="RETURN HOME">RETURN HOME</span></a></h2>
+      </header>
 
-    <header>
-      <h1 data-text="JORDAN">JORDAN</h1>
-      <h2><a href="index.html"><span class="local-glitch-text" data-text="RETURN HOME">RETURN HOME</span></a></h2>
-    </header>
-
-    <section class="section" id="projects">
-      <div class="project-container">
-        <div class="project">
-          <div class="project-number">#000</div>
-          <div class="project-title local-glitch-text" data-text="AttackVector Details">
-            AttackVector Details
+      <section class="section" id="projects">
+        <div class="project-container">
+          <div class="project" data-visual="attackvector">
+            <div class="project-number">#000</div>
+            <div class="project-title local-glitch-text" data-text="AttackVector Details">
+              AttackVector Details
+            </div>
+            <div class="project-description local-glitch-text" data-text="Details about the AttackVector project.">
+              Details about the AttackVector project.
+            </div>
           </div>
-          <div class="project-description local-glitch-text" data-text="Details about the AttackVector project.">
-            Details about the AttackVector project.
+
+          <div class="project" data-visual="placeholder1">
+            <div class="project-number">#001</div>
+            <div class="project-title local-glitch-text" data-text="Placeholder Details 2">
+              Placeholder Details 2
+            </div>
+            <div class="project-description local-glitch-text" data-text="This is a placeholder project description.">
+              This is a placeholder project description.
+            </div>
+          </div>
+
+          <div class="project" data-visual="placeholder2">
+            <div class="project-number">#002</div>
+            <div class="project-title local-glitch-text" data-text="Placeholder Details 3">
+              Placeholder Details 3
+            </div>
+            <div class="project-description local-glitch-text"
+              data-text="This is another placeholder project description.">
+              This is another placeholder project description.
+            </div>
+          </div>
+
+          <div class="project" data-visual="placeholder3">
+            <div class="project-number">#003</div>
+            <div class="project-title local-glitch-text" data-text="Placeholder Details 4">
+              Placeholder Details 4
+            </div>
+            <div class="project-description local-glitch-text" data-text="Yet another placeholder project description.">
+              Yet another placeholder project description.
+            </div>
           </div>
         </div>
+      </section>
+    </div>
 
-        <div class="project">
-          <div class="project-number">#001</div>
-          <div class="project-title local-glitch-text" data-text="Placeholder Details 2">
-            Placeholder Details 2
-          </div>
-          <div class="project-description local-glitch-text" data-text="This is a placeholder project description.">
-            This is a placeholder project description.
-          </div>
-        </div>
-
-        <div class="project">
-          <div class="project-number">#002</div>
-          <div class="project-title local-glitch-text" data-text="Placeholder Details 3">
-            Placeholder Details 3
-          </div>
-          <div class="project-description local-glitch-text"
-            data-text="This is another placeholder project description.">
-            This is another placeholder project description.
-          </div>
-        </div>
-
-        <div class="project">
-          <div class="project-number">#003</div>
-          <div class="project-title local-glitch-text" data-text="Placeholder Details 4">
-            Placeholder Details 4
-          </div>
-          <div class="project-description local-glitch-text" data-text="Yet another placeholder project description.">
-            Yet another placeholder project description.
-          </div>
-        </div>
-      </div>
-    </section>
+    <div class="visual-area">
+      <div class="dynamic-visual" id="dynamic-visual"></div>
+    </div>
   </div>
 
   <footer>

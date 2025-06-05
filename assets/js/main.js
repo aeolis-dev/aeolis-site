@@ -1,4 +1,4 @@
-// Initialize project card hover effects and animations.
+// Initialize project card hover effects and dynamic visual area
 document.querySelectorAll('.project').forEach((project, i) => {
   // Apply a staggered entrance animation delay (if defined in CSS).
   project.style.animationDelay = `${0.1 + i * 0.1}s`;
@@ -12,35 +12,31 @@ document.querySelectorAll('.project').forEach((project, i) => {
     project.style.setProperty('--mouse-x', `${x}px`);
     project.style.setProperty('--mouse-y', `${y}px`);
   });
+
+  // Dynamic visual area functionality
+  const dynamicVisual = document.getElementById('dynamic-visual');
+  if (dynamicVisual) {
+    project.addEventListener('mouseenter', () => {
+      const visualType = project.getAttribute('data-visual');
+      // Remove all existing visual classes
+      dynamicVisual.className = 'dynamic-visual';
+      // Add the specific visual class
+      if (visualType) {
+        dynamicVisual.classList.add(visualType);
+      }
+    });
+
+    project.addEventListener('mouseleave', () => {
+      // Reset to default state
+      dynamicVisual.className = 'dynamic-visual';
+    });
+  }
 });
 
 // Signal that the page has loaded (e.g., for CSS to fade in content).
 window.addEventListener('load', () => {
   document.body.classList.add('loaded');
 });
-
-// Dynamically set random animation duration for the main H1 title's glitch effect.
-const titleElement = document.querySelector('h1');
-
-function setRandomGlitchDurationForTitle() {
-  // Check if the titleElement exists and does not have 'local-glitch-text' 
-  // (as that class has its own JS-controlled animation states).
-  if (titleElement && !titleElement.classList.contains('local-glitch-text')) {
-    const minDuration = 2; // seconds
-    const maxDuration = 7; // seconds
-    // Random duration (e.g., 2.0s to 7.0s).
-    const randomDuration = Math.random() * (maxDuration - minDuration) + minDuration;
-    titleElement.style.animationDuration = `${randomDuration.toFixed(1)}s`;
-  }
-}
-
-// Initial setup for H1 title glitch animation, if applicable.
-if (titleElement && !titleElement.classList.contains('local-glitch-text')) {
-  setRandomGlitchDurationForTitle(); // Set an initial random duration.
-  // Update duration upon each completion of the animation iteration for variety.
-  // Note: 'animationiteration' event fires when an iteration of an animation ends.
-  titleElement.addEventListener('animationiteration', setRandomGlitchDurationForTitle);
-}
 
 document.addEventListener('DOMContentLoaded', () => {
   const localGlitchElements = document.querySelectorAll('.local-glitch-text');
@@ -102,11 +98,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Note: The local glitch effect is primarily activated by mouse movement.
-  // For an effect on page load without mouse interaction, a more complex solution
-  // (e.g., manually triggering a check after a timeout) might be needed.
+  // Enhanced floating title animation based on mouse position
+  const floatingTitle = document.querySelector('.floating-title');
+  if (floatingTitle) {
+    document.addEventListener('mousemove', (e) => {
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      
+      // Calculate offset based on mouse position (subtle parallax effect)
+      const offsetX = (mouseX - centerX) * 0.01;
+      const offsetY = (mouseY - centerY) * 0.01;
+      
+      floatingTitle.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) rotateX(20deg) rotateY(-10deg)`;
+    });
+  }
 });
 
+// Enhanced "YOU ARE HERE" effect for the AEOLIS project
 const aeolisTitle = document.getElementById('project-title-3');
 
 if (aeolisTitle) {
@@ -117,14 +127,14 @@ if (aeolisTitle) {
   aeolisTitle.addEventListener('mouseover', () => {
     aeolisTitle.textContent = hoverText;
     aeolisTitle.setAttribute('data-text', hoverText);
-    // Optional: trigger glitch animation class if needed
-    // aeolisTitle.classList.add('glitch-active');
+    // Add enhanced glitch effect
+    aeolisTitle.classList.add('glitch-active');
   });
 
   aeolisTitle.addEventListener('mouseout', () => {
     aeolisTitle.textContent = originalText;
     aeolisTitle.setAttribute('data-text', originalDataText);
-    // Optional: remove glitch animation class if needed
-    // aeolisTitle.classList.remove('glitch-active');
+    // Remove enhanced glitch effect
+    aeolisTitle.classList.remove('glitch-active');
   });
 } 
