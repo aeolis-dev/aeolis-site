@@ -1,0 +1,27 @@
+.theme-sugar {
+    --bg-primary: #1C1C1E;
+    --bg-secondary: #2C2C2E;
+    --bg-tertiary: #3A3A3C;
+
+    --accent-primary: #ff005c;
+    --accent-secondary: #00f7ff;
+    --accent-tertiary: #ffc400;
+    --accent-quaternary: #7b00e0;
+    --accent-success: #00ff87;
+    --accent-warning: #ff3c00;
+
+    --text-primary: #f4f4f5;
+    --text-secondary: #d1d1d6;
+    --text-highlight: #ffffff;
+    --text-technical: #f4f4f5;
+
+    --glass-primary: rgba(27, 27, 30, 0.5);
+    --glass-secondary: rgba(255, 0, 92, 0.15);
+    --glass-tertiary: rgba(0, 247, 255, 0.1);
+    --glass-accent: rgba(123, 0, 224, 0.15);
+    
+    --border-primary: rgba(255, 0, 92, 0.6);
+    --border-secondary: rgba(244, 244, 245, 0.25);
+    --border-accent: #00f7ff;
+    --border-hard: rgba(244, 244, 245, 0.8);
+} 

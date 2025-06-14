@@ -1,0 +1,27 @@
+.theme-tropical {
+    --bg-primary: #1A0A10;
+    --bg-secondary: #261018;
+    --bg-tertiary: #381824;
+
+    --accent-primary: #e91e63;
+    --accent-secondary: #ff5722;
+    --accent-tertiary: #ff9800;
+    --accent-quaternary: #4caf50;
+    --accent-success: #8bc34a;
+    --accent-warning: #f44336;
+
+    --text-primary: #fce4ec;
+    --text-secondary: #f48fb1;
+    --text-highlight: #ffeb3b;
+    --text-technical: #fce4ec;
+
+    --glass-primary: rgba(233, 30, 99, 0.1);
+    --glass-secondary: rgba(255, 87, 34, 0.15);
+    --glass-tertiary: rgba(255, 152, 0, 0.1);
+    --glass-accent: rgba(76, 175, 80, 0.15);
+    
+    --border-primary: rgba(233, 30, 99, 0.5);
+    --border-secondary: rgba(252, 228, 236, 0.25);
+    --border-accent: #e91e63;
+    --border-hard: rgba(252, 228, 236, 0.7);
+} 

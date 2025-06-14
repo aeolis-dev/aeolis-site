@@ -1,0 +1,27 @@
+.theme-sakura {
+    --bg-primary: #FFF0F5;
+    --bg-secondary: #FFE4E1;
+    --bg-tertiary: #FFFFFF;
+    
+    --accent-primary: #FFB6C1;
+    --accent-secondary: #FF69B4;
+    --accent-tertiary: #DB7093;
+    --accent-quaternary: #C71585;
+    --accent-success: #3CB371;
+    --accent-warning: #FF4500;
+  
+    --text-primary: #363636;
+    --text-secondary: #708090;
+    --text-highlight: #FF69B4;
+    --text-technical: #800080;
+  
+    --glass-primary: rgba(255, 255, 255, 0.6);
+    --glass-secondary: rgba(255, 182, 193, 0.2);
+    --glass-tertiary: rgba(255, 105, 180, 0.15);
+    --glass-accent: rgba(219, 112, 147, 0.2);
+  
+    --border-primary: rgba(255, 105, 180, 0.6);
+    --border-secondary: rgba(54, 54, 54, 0.25);
+    --border-accent: #FF69B4;
+    --border-hard: rgba(54, 54, 54, 0.7);
+} 

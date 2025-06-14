@@ -1,0 +1,27 @@
+.theme-lavender {
+    --bg-primary: #E6E6FA;
+    --bg-secondary: #D8BFD8;
+    --bg-tertiary: #FFFFFF;
+    
+    --accent-primary: #9370DB;
+    --accent-secondary: #8A2BE2;
+    --accent-tertiary: #BA55D3;
+    --accent-quaternary: #4B0082;
+    --accent-success: #3CB371;
+    --accent-warning: #FF6347;
+  
+    --text-primary: #483D8B;
+    --text-secondary: #6A5ACD;
+    --text-highlight: #8A2BE2;
+    --text-technical: #800080;
+  
+    --glass-primary: rgba(255, 255, 255, 0.6);
+    --glass-secondary: rgba(147, 112, 219, 0.2);
+    --glass-tertiary: rgba(138, 43, 226, 0.15);
+    --glass-accent: rgba(75, 0, 130, 0.2);
+  
+    --border-primary: rgba(147, 112, 219, 0.6);
+    --border-secondary: rgba(72, 61, 139, 0.25);
+    --border-accent: #8A2BE2;
+    --border-hard: rgba(72, 61, 139, 0.7);
+} 

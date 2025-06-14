@@ -1,15 +1,17 @@
-/* TODO: Hover glitch effects are in the wrong position for footer text */
-/* TODO: Add stylised scrollbar for index page */
-/* TODO: Fix index page being too long to fit the footer */
-/* TODO: Fix rotating card elements */
-/* TODO: Make index elements more obviously clickable, with title and text on separate lines */
-/* TODO: Even glassier look */
-/* TODO: Colourful accent is a bit odd */
-/* TODO: Page is still a bit too green overall */
-/* TODO: Constantly scrolling top accent looks like a loading effect, maybe keep it but it scrolls only once or twice */
-/* TODO: The element card on the right side could have informational text and effect when hovered over */
-/* TODO: "Return home" could have a back arrow */
-/* TODO: Line things up better in general */
+/* TO DO:  Find performance issues */
+/* TO DO:  Have alternative dark and light themes */
+/* TO DO:  Change themes from dropdown to clickable squares somewhere on the page */
+/* TO DO:  Fix rotating cards */
+/* TO DO:  Change dark/light button to just text */
+/* TO DO:  Glassier elements */
+/* TO DO:  More depth */
+/* TO DO:  Background name text more visible, bring the glitching on top effect back */
+/* TO DO:  Favicon */
+/* TO DO:  More interesting scrollbar, make width of project elements consistent with and without it */
+/* TO DO:  Contact page text is wrong */
+/* TO DO:  Less blur/soft edges, more hard and striking colours and elements */
+/* TO DO:  Start a new chat */
+/* TO DO:  Get rid of themes I don't like */
 
 /* ==========================================================================
    1. FONT IMPORTS & GLOBAL VARIABLES
@@ -20,32 +22,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap');
 
 :root {
-  --bg-primary: #05080A;
-  --bg-secondary: #0A0F14;
-  --bg-tertiary: #101A20;
-  
-  --accent-primary: #00FFDD;  /* Teal/Cyan - Primary Action & Glow */
-  --accent-secondary: #FF0066; /* Magenta - Secondary Highlight & Warning */
-  --accent-tertiary: #FFAA00;  /* Orange - Tertiary Info & Status */
-  --accent-quaternary: #8800FF; /* Purple - Deep Glow & Background Elements */
-  --accent-success: #00FF88;   /* Green - Success states */
-  --accent-warning: #FF4400;   /* Red-Orange - Warning states */
-
-  --text-primary: #FFFFFF;     /* Increased contrast from #E0E0E0 */
-  --text-secondary: #C0C0C0;   /* Increased contrast from #A0A0A0 */
-  --text-highlight: var(--accent-primary);
-  --text-technical: #E0E0E0;   /* Increased contrast from #C0C0C0 */
-
-  --glass-primary: rgba(255, 255, 255, 0.08);
-  --glass-secondary: rgba(0, 255, 221, 0.12);
-  --glass-tertiary: rgba(255, 0, 102, 0.10);
-  --glass-accent: rgba(136, 0, 255, 0.15);
-
-  --border-primary: rgba(0, 255, 221, 0.4);  /* Increased from 0.2 */
-  --border-secondary: rgba(255, 255, 255, 0.2); /* Increased from 0.1 */
-  --border-accent: var(--accent-primary);
-  --border-hard: rgba(255, 255, 255, 0.6);   /* Hard edges */
-
   --font-main: 'Rajdhani', 'Orbitron', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
@@ -79,13 +55,13 @@
 }
 
 html, body {
-  height: 100vh;
+  height: 100%; /* Changed from 100vh to allow content to define height */
   margin: 0;
-  overflow-x: hidden;
+  overflow: hidden; /* Prevent body scrollbars */
 }
 
 body {
-  min-height: 100vh;
+  height: 100vh; /* Use viewport height for the main layout */
   display: flex;
   flex-direction: column;
   font-family: var(--font-mono);
@@ -104,8 +80,8 @@ body::before { /* Background Grid */
   background-image: 
     linear-gradient(var(--accent-quaternary) 1px, transparent 1px),
     linear-gradient(to right, var(--accent-quaternary) 1px, transparent 1px),
-    linear-gradient(45deg, rgba(0, 255, 221, 0.02) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(255, 0, 102, 0.02) 25%, transparent 25%);
+    linear-gradient(45deg, rgba(0, 191, 255, 0.02) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255, 0, 255, 0.02) 25%, transparent 25%);
   background-size: 100px 100px, 100px 100px, 50px 50px, 50px 50px;
   opacity: var(--grid-opacity);
   animation: bgGridPulse 20s linear infinite alternate;
@@ -131,43 +107,35 @@ body::after { /* Noise Overlay */
     0deg,
     transparent,
     transparent 3px,
-    rgba(0, 255, 221, var(--scanline-opacity)) 3px,
-    rgba(0, 255, 221, var(--scanline-opacity)) 5px
+    rgba(75, 0, 130, var(--scanline-opacity)) 3px, /* Changed from green to Indigo */
+    rgba(75, 0, 130, var(--scanline-opacity)) 5px
   );
   animation: scanlinesMove 15s linear infinite;
   z-index: 2;
   pointer-events: none;
 }
 
-/* Hard-edge decorative elements */
+/* Top accent bar - limited animation */
 .glitch-scanlines {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 3px;
   background: linear-gradient(90deg, 
     transparent 0%, 
-    var(--accent-primary) 20%, 
-    var(--accent-secondary) 40%, 
-    var(--accent-tertiary) 60%, 
-    var(--accent-quaternary) 80%, 
+    var(--accent-primary) 30%, 
+    var(--accent-secondary) 70%, 
     transparent 100%);
-  animation: dataStreamFlow 3s linear infinite;
+  /* Animate twice then fade out */
+  animation: dataStreamFlow 1.5s linear 2, fadeOut 1s 3s forwards;
   z-index: 100;
   pointer-events: none;
+  opacity: 0.8;
 }
 
 .glitch-scanlines::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--accent-primary);
-  opacity: 0.8;
-  animation: scanlineGlitch 0.5s steps(5) infinite;
+  display: none; /* Removed the distracting sub-glitch */
 }
 
 /* ==========================================================================
@@ -185,10 +153,10 @@ body::after { /* Noise Overlay */
   color: transparent;
   background-image: linear-gradient(
     110deg,
-    rgba(0, 255, 221, 0.2) 10%,
-    rgba(255, 0, 102, 0.15) 40%,
-    rgba(136, 0, 255, 0.2) 70%,
-    rgba(0, 255, 221, 0.08) 90%
+    rgba(0, 191, 255, 0.2) 10%,
+    rgba(255, 0, 255, 0.15) 40%,
+    rgba(75, 0, 130, 0.2) 70%,
+    rgba(0, 191, 255, 0.08) 90%
   );
   background-clip: text;
   -webkit-background-clip: text;
@@ -196,9 +164,9 @@ body::after { /* Noise Overlay */
   pointer-events: none;
   animation: titleDrift 20s ease-in-out infinite alternate, titleColorCycle 30s linear infinite;
   text-shadow: 
-    0 0 15px rgba(0, 255, 221, 0.2),
-    0 0 30px rgba(0, 255, 221, 0.1),
-    0 0 60px rgba(136, 0, 255, 0.15);
+    0 0 15px rgba(0, 191, 255, 0.2),
+    0 0 30px rgba(0, 191, 255, 0.1),
+    0 0 60px rgba(75, 0, 130, 0.15);
   letter-spacing: -0.02em;
   user-select: none;
   filter: blur(0.5px) brightness(1.3);
@@ -212,32 +180,34 @@ body::after { /* Noise Overlay */
 .content {
   flex: 1 0 auto;
   position: relative;
-  padding: 2rem 3rem;
+  padding: 2rem 3rem; /* Reduced padding for symmetry */
   max-width: 1920px;
   margin: 0 auto;
   width: 100%;
   z-index: 10;
   display: flex;
   gap: 3rem;
-  align-items: flex-start;
-  min-height: calc(100vh - 8rem); /* Ensure content takes full height minus padding and footer */
+  align-items: stretch; /* Make columns same height */
+  height: calc(100vh - 5rem); /* Full height minus footer */
 }
 
 .main-area {
   flex: 2;
   max-width: 1000px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Ensure main area has full height */
+  gap: 1.5rem; /* Space between header and project container */
 }
 
 .visual-area {
   flex: 1;
   min-width: 400px;
   max-width: 600px;
-  height: calc(100vh - 12rem); /* Adjusted for proper footer positioning */
-  max-height: 700px;
-  position: sticky;
-  top: 2rem;
+  position: relative; /* No longer sticky */
   transform-style: preserve-3d;
+  height: 100%; /* Fill the container */
 }
 
 .dynamic-visual {
@@ -248,110 +218,171 @@ body::after { /* Noise Overlay */
   border-radius: 8px;
   overflow: hidden;
   background: var(--glass-primary);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(8px); /* Less blur */
   transform: perspective(1000px) rotateX(2deg) rotateY(-1deg);
   box-shadow: 
-    0 0 30px rgba(0, 255, 221, 0.1),
-    inset 0 0 30px rgba(255, 255, 255, 0.05),
-    0 8px 32px rgba(0, 0, 0, 0.3);
+    0 0 40px rgba(0, 191, 255, 0.15),
+    inset 0 0 20px rgba(2, 4, 8, 0.5),
+    0 8px 32px rgba(0, 0, 0, 0.4);
   transition: all var(--animation-speed-medium) ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.dynamic-visual::before, /* Pattern Layer */
-.dynamic-visual::after { /* Text Layer */
+.dynamic-visual:hover {
+  border-color: var(--border-accent);
+  box-shadow: 
+    0 0 50px rgba(0, 191, 255, 0.25),
+    inset 0 0 20px rgba(2, 4, 8, 0.5),
+    0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.dynamic-visual::before { /* Pattern Layer */
+  content: '';
   position: absolute;
   inset: 0;
   transition: all var(--animation-speed-medium) ease;
+  z-index: 1;
+}
+
+.dynamic-visual-text { /* Text Layer */
+  position: relative;
+  transition: all var(--animation-speed-medium) ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 2rem;
+  text-align: center;
+  z-index: 2;
+  background: var(--glass-secondary);
+  backdrop-filter: blur(5px);
+  border-radius: 6px;
+  width: 90%;
+  pointer-events: none; /* Let parent handle hover */
 }
 
 .dynamic-visual::before {
   content: '';
   background: 
-    repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 255, 221, 0.05) 10px, rgba(0, 255, 221, 0.05) 20px),
-    radial-gradient(circle at 50% 50%, rgba(136, 0, 255, 0.1) 0%, transparent 50%);
+    repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 191, 255, 0.05) 10px, rgba(0, 191, 255, 0.05) 20px),
+    radial-gradient(circle at 50% 50%, rgba(75, 0, 130, 0.1) 0%, transparent 50%);
   opacity: 0.6;
 }
 
-.dynamic-visual::after {
-  content: '[SYSTEM_READY]';
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.dynamic-visual::after { display: none; } /* Decommission old text layer */
+
+.dynamic-visual .visual-text-default,
+.dynamic-visual .visual-text-hover {
+  transition: opacity var(--animation-speed-medium) ease;
+  width: 100%;
+}
+.dynamic-visual .visual-text-hover {
+  position: absolute;
+  opacity: 0;
+}
+.dynamic-visual:hover .visual-text-default {
+  opacity: 0;
+}
+.dynamic-visual:hover .visual-text-hover {
+  opacity: 1;
+}
+
+.dynamic-visual-title {
   font-family: var(--font-mono);
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--text-technical);
   text-shadow: 0 0 10px currentColor;
-  background: var(--glass-secondary);
-  backdrop-filter: blur(5px);
+  text-transform: uppercase;
 }
+.dynamic-visual-desc {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* Default state visual */
+.dynamic-visual[data-state="default"]::before {
+  background: 
+    repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 191, 255, 0.05) 10px, rgba(0, 191, 255, 0.05) 20px),
+    radial-gradient(circle at 50% 50%, rgba(75, 0, 130, 0.1) 0%, transparent 50%);
+}
+.dynamic-visual[data-state="default"] .dynamic-visual-title { color: var(--text-technical); }
 
 /* Project-specific visuals */
 .dynamic-visual.attackvector::before {
   background: 
-    repeating-linear-gradient(0deg, transparent, transparent 5px, rgba(255, 0, 102, 0.15) 5px, rgba(255, 0, 102, 0.15) 10px),
-    repeating-linear-gradient(90deg, transparent, transparent 5px, rgba(255, 0, 102, 0.1) 5px, rgba(255, 0, 102, 0.1) 10px),
-    radial-gradient(circle at 30% 70%, rgba(255, 0, 102, 0.2) 0%, transparent 50%);
+    repeating-linear-gradient(0deg, transparent, transparent 5px, rgba(255, 0, 255, 0.15) 5px, rgba(255, 0, 255, 0.15) 10px),
+    repeating-linear-gradient(90deg, transparent, transparent 5px, rgba(255, 0, 255, 0.1) 5px, rgba(255, 0, 255, 0.1) 10px),
+    radial-gradient(circle at 30% 70%, rgba(255, 0, 255, 0.2) 0%, transparent 50%);
   animation: targetAcquired 2s ease-in-out infinite alternate;
 }
-.dynamic-visual.attackvector::after { 
-  content: '[UNREAL ENGINE UTILISATION]'; 
+.dynamic-visual.attackvector .dynamic-visual-title {
   color: var(--accent-secondary); 
   text-shadow: 0 0 15px var(--accent-secondary);
-  background: var(--glass-tertiary);
 }
 
 .dynamic-visual.reptify::before {
   background: 
-    repeating-linear-gradient(120deg, transparent, transparent 8px, rgba(0, 255, 136, 0.15) 8px, rgba(0, 255, 136, 0.15) 16px),
-    radial-gradient(ellipse at 60% 40%, rgba(0, 255, 136, 0.2) 0%, transparent 60%);
+    repeating-linear-gradient(120deg, transparent, transparent 8px, rgba(57, 255, 20, 0.15) 8px, rgba(57, 255, 20, 0.15) 16px),
+    radial-gradient(ellipse at 60% 40%, rgba(57, 255, 20, 0.2) 0%, transparent 60%);
   animation: pulseGrid 3s ease-in-out infinite;
 }
-.dynamic-visual.reptify::after { 
-  content: '[MOVEMENT OPTIMISATION]'; 
+.dynamic-visual.reptify .dynamic-visual-title { 
   color: var(--accent-success);
   text-shadow: 0 0 15px var(--accent-success);
-  background: rgba(0, 255, 136, 0.1);
 }
 
 .dynamic-visual.megaherb::before {
   background: 
-    repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(255, 170, 0, 0.15) 30deg, transparent 60deg),
-    radial-gradient(circle at 70% 30%, rgba(255, 170, 0, 0.2) 0%, transparent 50%);
+    repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(148, 0, 211, 0.15) 30deg, transparent 60deg),
+    radial-gradient(circle at 70% 30%, rgba(148, 0, 211, 0.2) 0%, transparent 50%);
   animation: soundwaveRipple 4s ease-in-out infinite;
 }
-.dynamic-visual.megaherb::after { 
-  content: '[AUDIO EXPERIMENTATION]'; 
+.dynamic-visual.megaherb .dynamic-visual-title {
   color: var(--accent-tertiary); 
   text-shadow: 0 0 15px var(--accent-tertiary);
-  background: rgba(255, 170, 0, 0.1);
 }
 
 .dynamic-visual.aeolis::before {
   background: 
-    repeating-linear-gradient(60deg, transparent, transparent 12px, rgba(136, 0, 255, 0.15) 12px, rgba(136, 0, 255, 0.15) 24px),
-    repeating-linear-gradient(-60deg, transparent, transparent 12px, rgba(136, 0, 255, 0.1) 12px, rgba(136, 0, 255, 0.1) 24px);
+    repeating-linear-gradient(60deg, transparent, transparent 12px, rgba(75, 0, 130, 0.15) 12px, rgba(75, 0, 130, 0.15) 24px),
+    repeating-linear-gradient(-60deg, transparent, transparent 12px, rgba(75, 0, 130, 0.1) 12px, rgba(75, 0, 130, 0.1) 24px);
   animation: dataCoreSpin 6s linear infinite;
 }
-.dynamic-visual.aeolis::after { 
-  content: '[AEOLIS.DEV ONLINE]'; 
+.dynamic-visual.aeolis .dynamic-visual-title { 
   color: var(--accent-quaternary); 
   text-shadow: 0 0 15px var(--accent-quaternary);
-  background: var(--glass-accent);
+}
+
+.dynamic-visual.placeholder::before {
+    background:
+        repeating-linear-gradient(
+            -45deg,
+            var(--bg-tertiary),
+            var(--bg-tertiary) 10px,
+            var(--bg-secondary) 10px,
+            var(--bg-secondary) 20px
+        );
+    animation: placeholderPulse 2s ease-in-out infinite;
+}
+.dynamic-visual.placeholder .dynamic-visual-title {
+    color: var(--text-secondary);
 }
 
 .dynamic-visual.contact::before {
   background: 
-    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 255, 221, 0.2) 3px, rgba(0, 255, 221, 0.2) 6px),
-    repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(0, 255, 221, 0.15) 3px, rgba(0, 255, 221, 0.15) 6px),
-    linear-gradient(45deg, rgba(0, 255, 221, 0.1) 0%, rgba(255, 0, 102, 0.1) 50%, rgba(0, 255, 221, 0.1) 100%);
+    repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 191, 255, 0.2) 3px, rgba(0, 191, 255, 0.2) 6px),
+    repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(0, 191, 255, 0.15) 3px, rgba(0, 191, 255, 0.15) 6px),
+    linear-gradient(45deg, rgba(0, 191, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 50%, rgba(0, 191, 255, 0.1) 100%);
   animation: connectionLines 2s linear infinite;
 }
-.dynamic-visual.contact::after { 
-  content: '[UPLINK_ESTABLISHED]'; 
+.dynamic-visual.contact .dynamic-visual-title {
   color: var(--accent-primary);
   text-shadow: 0 0 15px var(--accent-primary);
-  background: var(--glass-secondary);
 }
 
 /* ==========================================================================
@@ -359,21 +390,46 @@ body::after { /* Noise Overlay */
    ========================================================================== */
 
 header {
-  margin-bottom: 3rem;
+  height: 5rem; /* Fixed height */
+  padding: 0 3rem;
+  background: var(--glass-primary);
+  border-bottom: 1px solid var(--border-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   position: relative;
-  z-index: 15;
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--accent-primary) 25%, 
+    var(--accent-secondary) 50%, 
+    var(--accent-tertiary) 75%, 
+    transparent 100%);
+  opacity: 0.8;
+  transform: translateX(5px);
 }
 
 h2 { /* Main page subtitle */
   font-family: var(--font-main);
-  font-size: 2.5rem;
+  font-size: 2.2rem; /* Slightly smaller for space */
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 1rem;
+  margin: 0; /* Remove margin */
   position: relative;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  filter: drop-shadow(0 0 10px rgba(0, 255, 221, 0.3));
+  line-height: 1.2; /* Reduced line height */
+  filter: drop-shadow(0 0 10px rgba(0, 191, 255, 0.3));
 }
 
 h2::before { /* Decorative bracket/line */
@@ -400,42 +456,113 @@ h2 a:hover {
   transform: translateX(5px);
 }
 
+.theme-toggle {
+  /* No longer needs absolute positioning */
+}
+
+#theme-toggle-button {
+  background: var(--glass-secondary);
+  border: 1px solid var(--border-secondary);
+  color: var(--text-secondary);
+  padding: 0.5rem 1rem;
+  font-family: var(--font-technical);
+  font-size: 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--animation-speed-fast) ease;
+  letter-spacing: 0.05em;
+}
+
+#theme-toggle-button:hover {
+  background: var(--glass-primary);
+  border-color: var(--border-primary);
+  color: var(--text-primary);
+  text-shadow: 0 0 5px var(--text-highlight);
+}
+
 /* ==========================================================================
    6. PROJECT CARDS
    ========================================================================== */
 
+section#projects {
+    flex: 1; /* Take up remaining vertical space */
+    min-height: 0; /* Allow shrinking in flex layout */
+    position: relative;
+}
+
 .project-container {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem; /* Reduced gap */
   position: relative;
+  overflow-y: auto; /* Enable scroll on overflow */
+  padding: 1.5rem; /* Uniform padding inside the container */
+  border: 2px solid var(--border-primary);
+  border-radius: 12px;
+  background: var(--glass-primary);
+  backdrop-filter: blur(8px);
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(240, 248, 255, 0.1);
+  height: 100%; /* Fill parent section */
+}
+
+/* Aesthetically consistent scrollbar */
+.project-container::-webkit-scrollbar {
+  width: 12px; /* Make scrollbar more visible */
+}
+.project-container::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-secondary);
+}
+.project-container::-webkit-scrollbar-thumb {
+  background-color: var(--accent-primary);
+  border-radius: 8px;
+  border: 2px solid var(--bg-secondary);
+  box-shadow: 0 0 5px rgba(0, 191, 255, 0.3);
+}
+.project-container::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent-secondary);
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+}
+
+.project-link {
+    text-decoration: none;
+    display: block;
+    outline: none;
+    position: relative; /* For z-index context */
+}
+.project-link:focus-visible .project { /* Accessibility */
+    border-color: var(--accent-secondary);
+    box-shadow: 0 0 20px var(--accent-secondary);
 }
 
 .project {
   position: relative;
-  padding: 2rem;
+  padding: 1.5rem; /* Reduced padding */
   border: 1px solid var(--border-primary);
   border-radius: 12px;
   background: var(--glass-primary);
-  backdrop-filter: blur(15px);
+  backdrop-filter: blur(12px); /* Glassier */
   transition: all var(--animation-speed-medium) ease;
-  cursor: pointer;
   transform: perspective(1000px) rotateX(1deg);
   box-shadow: 
-    0 4px 20px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(240, 248, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
 
-.project:hover {
-  transform: perspective(1000px) rotateX(0deg) translateY(-5px);
+.project-link:hover .project {
+  transform: perspective(1000px) rotateX(0deg) scale(1.03); /* Expand towards viewer */
   border-color: var(--border-accent);
   background: var(--glass-secondary);
   box-shadow: 
-    0 8px 40px rgba(0, 255, 221, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    0 0 30px rgba(0, 255, 221, 0.1);
+    0 8px 40px rgba(0, 191, 255, 0.2),
+    inset 0 1px 0 rgba(240, 248, 255, 0.2),
+    0 0 30px rgba(0, 191, 255, 0.15);
+  z-index: 10; /* Ensure it renders above other projects */
 }
 
 /* Decorative elements */
@@ -448,15 +575,14 @@ h2 a:hover {
   height: 2px;
   background: linear-gradient(90deg, 
     transparent 0%, 
-    var(--accent-primary) 20%, 
-    var(--accent-secondary) 50%, 
-    var(--accent-tertiary) 80%, 
+    var(--accent-primary) 40%, 
+    var(--accent-secondary) 60%, 
     transparent 100%);
   opacity: 0.6;
   transition: opacity var(--animation-speed-fast) ease;
 }
 
-.project:hover::before {
+.project-link:hover .project::before {
   opacity: 1;
   animation: dataStreamFlow 1s linear infinite;
 }
@@ -480,21 +606,25 @@ h2 a:hover {
 
 .project-title {
   font-family: var(--font-main);
-  font-size: 1.8rem;
+  font-size: 1.6rem; /* Slightly smaller */
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem; /* Increased margin */
   transition: all var(--animation-speed-fast) ease;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+  display: block; /* Ensure it takes full line */
+  width: 100%; /* Force full width */
+  clear: both; /* Clear any floats */
 }
 
-.project:hover .project-title {
+.project-link:hover .project .project-title {
   color: var(--accent-primary);
   text-shadow: 0 0 15px var(--accent-primary);
 }
 
 .project-title a {
+  /* This is now redundant */
   color: inherit;
   text-decoration: none;
 }
@@ -502,30 +632,29 @@ h2 a:hover {
 .project-description {
   font-size: 1rem;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.5; /* Adjusted line height */
   font-weight: 400;
   letter-spacing: 0.01em;
+  display: block; /* Ensure it takes full line */
+  width: 100%; /* Force full width */
+  clear: both; /* Clear any floats */
+  margin-top: 0.25rem; /* Add small top margin for separation */
 }
 
-/* Corner accents */
+/* New decorative element instead of corner accents */
 .project::after {
   content: '';
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
-  width: 12px;
-  height: 12px;
-  border-top: 2px solid var(--accent-primary);
-  border-left: 2px solid var(--accent-primary);
-  border-radius: 0;
-  opacity: 0.6;
-  transition: all var(--animation-speed-fast) ease;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  transition: width var(--animation-speed-medium) ease;
 }
 
-.project:hover::after {
-  opacity: 1;
-  transform: scale(1.2);
-  box-shadow: 0 0 10px var(--accent-primary);
+.project-link:hover .project::after {
+  width: 100%;
 }
 
 /* ==========================================================================
@@ -534,8 +663,13 @@ h2 a:hover {
 
 .local-glitch-text {
   position: relative;
-  display: inline-block;
-  transition: all var(--animation-speed-fast) ease;
+  color: var(--text-primary);
+  transition: color var(--animation-speed-fast) ease;
+  --glitch-intensity: 0; /* Re-add for proximity effect */
+}
+
+.local-glitch-text:hover {
+  color: transparent;
 }
 
 .local-glitch-text::before,
@@ -544,38 +678,60 @@ h2 a:hover {
   position: absolute;
   top: 0;
   left: 0;
-  opacity: 0;
+  width: 100%;
+  height: 100%;
+  opacity: var(--glitch-intensity);
+  transition: opacity var(--animation-speed-fast) ease, transform var(--animation-speed-fast) ease;
+  overflow: hidden;
   pointer-events: none;
-  transition: opacity var(--animation-speed-fast) ease;
+}
+
+.local-glitch-text:hover::before,
+.local-glitch-text:hover::after {
+  opacity: 1;
+}
+
+.local-glitch-text:hover::before {
+    transform: translate(-2px, -1px);
+}
+
+.local-glitch-text:hover::after {
+    transform: translate(2px, 1px);
 }
 
 .local-glitch-text::before {
   color: var(--accent-secondary);
   filter: hue-rotate(var(--glitch-hue1));
-  transform: translate(-2px, -1px);
-  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+  clip-path: polygon(
+    0% var(--glitch-y1),
+    100% var(--glitch-y1),
+    100% var(--glitch-y2),
+    0% var(--glitch-y2)
+  );
+  animation: glitch-anim-1 4s infinite linear alternate;
 }
 
 .local-glitch-text::after {
   color: var(--accent-primary);
   filter: hue-rotate(var(--glitch-hue2));
-  transform: translate(2px, 1px);
-  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+  clip-path: polygon(
+    0% var(--glitch-y3),
+    100% var(--glitch-y3),
+    100% var(--glitch-y4),
+    0% var(--glitch-y4)
+  );
+  animation: glitch-anim-2 3s infinite linear alternate-reverse;
 }
 
 /* Glitch activation */
 .local-glitch-text.glitch-active::before,
 .local-glitch-text.glitch-active::after {
-  opacity: 0.8;
-  animation: glitchAnim1 0.3s steps(5) infinite, textFlicker 0.1s steps(2) infinite;
+  opacity: var(--glitch-intensity);
+  /* The animation is now controlled by JS setting the intensity */
 }
 
-.local-glitch-text.glitch-active::after {
-  animation: glitchAnim2 0.3s steps(5) infinite, textFlicker 0.1s steps(2) infinite;
-}
-
-.project:hover .local-glitch-text::before,
-.project:hover .local-glitch-text::after {
+.project-link:hover .local-glitch-text::before,
+.project-link:hover .local-glitch-text::after {
   opacity: 0.3;
   animation: glitchAnim1 0.5s steps(3) infinite;
 }
@@ -588,16 +744,18 @@ footer {
   flex-shrink: 0;
   position: relative;
   z-index: 20;
-  padding: 2rem 3rem;
+  padding: 1.5rem 3rem;
   background: var(--glass-primary);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(15px);
   border-top: 1px solid var(--border-primary);
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* Center the content */
   align-items: center;
-  font-size: 0.9rem;
+  gap: 2rem; /* Add space between elements */
+  font-size: 1rem; /* Slightly larger font */
   color: var(--text-secondary);
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+  height: 5rem; /* Fixed height */
 }
 
 footer::before {
@@ -616,49 +774,107 @@ footer::before {
   opacity: 0.8;
 }
 
-footer a {
+.footer-link,
+.footer-link-active {
   color: var(--text-secondary);
   text-decoration: none;
-  transition: all var(--animation-speed-fast) ease;
+  font-family: var(--font-main);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   position: relative;
   padding: 0.5rem 1rem;
-  border-radius: 4px;
-  background: var(--glass-primary);
-  backdrop-filter: blur(5px);
-  border: 1px solid var(--border-secondary);
+  min-width: 120px; /* Ensure stable width */
+  text-align: center;
+  border: 1px solid transparent;
+  transition: all var(--animation-speed-medium) ease;
 }
 
-footer a:hover {
-  color: var(--accent-primary);
-  text-shadow: 0 0 10px var(--accent-primary);
-  border-color: var(--accent-primary);
+.footer-link:hover {
+  color: var(--text-highlight);
+  text-shadow: 0 0 10px var(--text-highlight);
+  border-color: var(--border-primary);
   background: var(--glass-secondary);
+  border-radius: 4px;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 191, 255, 0.2);
 }
 
-footer a::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 2px;
-  background: var(--accent-primary);
-  transition: width var(--animation-speed-fast) ease;
-}
-
-footer a:hover::after {
-  width: 100%;
-}
-
-footer .local-glitch-text[data-text*="JORDAN"] {
-  font-weight: 600;
+.footer-link-active {
   color: var(--text-primary);
-  text-shadow: 0 0 5px rgba(0, 255, 221, 0.3);
+  cursor: default;
   background: var(--glass-secondary);
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
   border: 1px solid var(--border-primary);
+  border-radius: 4px;
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.2);
+}
+
+.footer-copyright {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  opacity: 0.6;
+  letter-spacing: 0.05em;
+  user-select: none;
+}
+
+.footer-right-group {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.theme-switcher-container {
+  position: relative;
+  display: inline-block;
+}
+
+#theme-switcher-button {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+#theme-switcher-button:hover {
+  color: var(--text-primary);
+  text-shadow: 0 0 5px var(--accent-primary);
+}
+
+.theme-dropdown-content {
+  display: none;
+  position: absolute;
+  bottom: 100%; /* Position above the button */
+  right: 0;
+  background-color: var(--glass-primary);
+  backdrop-filter: blur(10px);
+  min-width: 160px;
+  border: 1px solid var(--border-primary);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.theme-dropdown-content.show {
+  display: block;
+}
+
+.theme-dropdown-content a {
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  text-decoration: none;
+  display: block;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.theme-dropdown-content a:hover {
+  background-color: var(--glass-secondary);
+  color: var(--text-primary);
 }
 
 /* ==========================================================================
@@ -701,7 +917,15 @@ footer .local-glitch-text[data-text*="JORDAN"] {
 
 @keyframes dataStreamFlow {
   0% { transform: translateX(-100%); }
+  50% { transform: translateX(0%); }
   100% { transform: translateX(100%); }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
 }
 
 @keyframes scanlineGlitch {
@@ -720,20 +944,26 @@ footer .local-glitch-text[data-text*="JORDAN"] {
 }
 
 @keyframes soundwaveRipple {
-  0% { transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.1) rotate(180deg); }
-  100% { transform: scale(1) rotate(360deg); }
+  0% { transform: scale(1) rotate(0deg); opacity: 0.5; }
+  50% { transform: scale(1.05) rotate(10deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 0.5; }
 }
 
 @keyframes dataCoreSpin {
   0% { transform: rotate(0deg) scale(1); }
-  100% { transform: rotate(360deg) scale(1.05); }
+  50% { transform: rotate(180deg) scale(1.05); }
+  100% { transform: rotate(360deg) scale(1); }
 }
 
 @keyframes connectionLines {
   0% { opacity: 0.6; transform: translateX(0); }
   50% { opacity: 1; transform: translateX(2px); }
   100% { opacity: 0.6; transform: translateX(0); }
+}
+
+@keyframes placeholderPulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
 }
 
 @keyframes projectScan {
@@ -765,10 +995,15 @@ footer .local-glitch-text[data-text*="JORDAN"] {
   50% { opacity: 0.4; }
 }
 
-@keyframes projectHoverVibrate {
-  0%, 100% { transform: perspective(1000px) rotateX(1deg) translateX(0); }
-  25% { transform: perspective(1000px) rotateX(1deg) translateX(-1px); }
-  75% { transform: perspective(1000px) rotateX(1deg) translateX(1px); }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ==========================================================================

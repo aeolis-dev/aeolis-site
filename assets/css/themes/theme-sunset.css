@@ -1,0 +1,27 @@
+.theme-sunset {
+    --bg-primary: #2C1B47;
+    --bg-secondary: #4A2A69;
+    --bg-tertiary: #7B4B9E;
+    
+    --accent-primary: #FF8C00;
+    --accent-secondary: #FF4500;
+    --accent-tertiary: #E63946;
+    --accent-quaternary: #A83A7E;
+    --accent-success: #F1FAEE;
+    --accent-warning: #E63946;
+  
+    --text-primary: #F1FAEE;
+    --text-secondary: #FADBC5;
+    --text-highlight: #FF8C00;
+    --text-technical: #FFB86F;
+  
+    --glass-primary: rgba(74, 42, 105, 0.5);
+    --glass-secondary: rgba(255, 140, 0, 0.15);
+    --glass-tertiary: rgba(255, 69, 0, 0.1);
+    --glass-accent: rgba(230, 57, 70, 0.2);
+  
+    --border-primary: rgba(255, 140, 0, 0.6);
+    --border-secondary: rgba(241, 250, 238, 0.25);
+    --border-accent: #FF8C00;
+    --border-hard: rgba(241, 250, 238, 0.7);
+} 

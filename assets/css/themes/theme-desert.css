@@ -1,0 +1,27 @@
+.theme-desert {
+    --bg-primary: #F4A460;
+    --bg-secondary: #D2B48C;
+    --bg-tertiary: #FAEBD7;
+    
+    --accent-primary: #CD853F;
+    --accent-secondary: #8B4513;
+    --accent-tertiary: #A0522D;
+    --accent-quaternary: #2F4F4F;
+    --accent-success: #556B2F;
+    --accent-warning: #B22222;
+  
+    --text-primary: #5C4033;
+    --text-secondary: #800000;
+    --text-highlight: #8B4513;
+    --text-technical: #2F4F4F;
+  
+    --glass-primary: rgba(250, 235, 215, 0.5);
+    --glass-secondary: rgba(205, 133, 63, 0.2);
+    --glass-tertiary: rgba(139, 69, 19, 0.15);
+    --glass-accent: rgba(160, 82, 45, 0.2);
+  
+    --border-primary: rgba(139, 69, 19, 0.6);
+    --border-secondary: rgba(92, 64, 51, 0.25);
+    --border-accent: #8B4513;
+    --border-hard: rgba(92, 64, 51, 0.7);
+} 

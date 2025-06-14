@@ -1,0 +1,27 @@
+.theme-ocean {
+    --bg-primary: #000428;
+    --bg-secondary: #000a3d;
+    --bg-tertiary: #001053;
+
+    --accent-primary: #00b4d8;
+    --accent-secondary: #0077b6;
+    --accent-tertiary: #03045e;
+    --accent-quaternary: #90e0ef;
+    --accent-success: #48cae4;
+    --accent-warning: #ff6b6b;
+
+    --text-primary: #caf0f8;
+    --text-secondary: #ade8f4;
+    --text-highlight: #ffffff;
+    --text-technical: #caf0f8;
+
+    --glass-primary: rgba(0, 10, 61, 0.5);
+    --glass-secondary: rgba(0, 180, 216, 0.15);
+    --glass-tertiary: rgba(144, 224, 239, 0.1);
+    --glass-accent: rgba(3, 4, 94, 0.2);
+
+    --border-primary: rgba(0, 180, 216, 0.5);
+    --border-secondary: rgba(202, 240, 248, 0.25);
+    --border-accent: #ffffff;
+    --border-hard: rgba(202, 240, 248, 0.7);
+} 

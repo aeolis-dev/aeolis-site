@@ -1,0 +1,27 @@
+.theme-inferno {
+    --bg-primary: #000000;
+    --bg-secondary: #1A0A02;
+    --bg-tertiary: #2E1404;
+    
+    --accent-primary: #FF4500;
+    --accent-secondary: #FF6347;
+    --accent-tertiary: #FFD700;
+    --accent-quaternary: #DC143C;
+    --accent-success: #ADFF2F;
+    --accent-warning: #FF0000;
+  
+    --text-primary: #FFF0E6;     
+    --text-secondary: #D2B48C;
+    --text-highlight: #FF4500;
+    --text-technical: #FFA07A;
+  
+    --glass-primary: rgba(26, 10, 2, 0.5);
+    --glass-secondary: rgba(255, 69, 0, 0.1);
+    --glass-tertiary: rgba(255, 99, 71, 0.1);
+    --glass-accent: rgba(220, 20, 60, 0.15);
+  
+    --border-primary: rgba(255, 69, 0, 0.5);
+    --border-secondary: rgba(255, 240, 230, 0.25);
+    --border-accent: #FF4500;
+    --border-hard: rgba(255, 240, 230, 0.7);
+} 

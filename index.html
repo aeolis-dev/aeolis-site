@@ -21,75 +21,109 @@
     <div class="main-area">
       <header>
         <h2><span class="local-glitch-text" data-text="Portfolio Index">Portfolio Index</span></h2>
+        <div class="theme-toggle">
+          <button id="theme-toggle-button">LIGHT &gt;&gt;</button>
+        </div>
       </header>
 
       <section class="section" id="projects">
         <div class="project-container">
-          <div class="project" data-visual="attackvector">
-            <div class="project-number">#000</div>
-            <a href="attackvector.html">
+          <a href="attackvector.html" class="project-link">
+            <div class="project" data-visual="attackvector">
+              <div class="project-number">#000</div>
               <div id="project-title-0" class="project-title local-glitch-text" data-text="AttackVector">
                 AttackVector
               </div>
-            </a>
-            <div class="project-description local-glitch-text" data-text="Futuristic arcade shooter.">
-              Futuristic arcade shooter.
+              <div class="project-description local-glitch-text" data-text="Futuristic arcade shooter.">
+                Futuristic arcade shooter.
+              </div>
             </div>
-          </div>
+          </a>
 
-          <div class="project" data-visual="reptify">
-            <div class="project-number">#001</div>
-            <a href="reptify.html">
+          <a href="reptify.html" class="project-link">
+            <div class="project" data-visual="reptify">
+              <div class="project-number">#001</div>
               <div id="project-title-1" class="project-title local-glitch-text" data-text="Reptify">
                 Reptify
               </div>
-            </a>
-            <div class="project-description local-glitch-text"
-              data-text="Streamlined mobile workout app for optimising muscle hypertrophy.">
-              Streamlined mobile workout app for optimising muscle hypertrophy.
+              <div class="project-description local-glitch-text"
+                data-text="Streamlined mobile workout app for optimising muscle hypertrophy.">
+                Streamlined mobile workout app for optimising muscle hypertrophy.
+              </div>
             </div>
-          </div>
+          </a>
 
-          <div class="project" data-visual="megaherb">
-            <div class="project-number">#002</div>
-            <a href="megaherb.html">
+          <a href="megaherb.html" class="project-link">
+            <div class="project" data-visual="megaherb">
+              <div class="project-number">#002</div>
               <div id="project-title-2" class="project-title local-glitch-text" data-text="WIP: MEGAHERB">
                 WIP: MEGAHERB
               </div>
-            </a>
-            <div class="project-description local-glitch-text"
-              data-text="Personal music project. Deconstructed beats, ambient textures and experiements with spatial audio.">
-              Personal music project. Deconstructed beats, ambient textures and experiments with spatial audio.
+              <div class="project-description local-glitch-text"
+                data-text="Personal music project. Deconstructed beats, ambient textures and experiments with spatial audio.">
+                Personal music project. Deconstructed beats, ambient textures and experiments with spatial audio.
+              </div>
             </div>
-          </div>
+          </a>
 
-          <div class="project" data-visual="aeolis">
-            <div class="project-number">#003</div>
-            <a href="index.html">
+          <a href="index.html" class="project-link">
+            <div class="project" data-visual="aeolis">
+              <div class="project-number">#003</div>
               <div id="project-title-3" class="project-title local-glitch-text" data-text="WIP: AEOLIS.DEV">
                 WIP: AEOLIS.DEV
               </div>
-            </a>
-            <div class="project-description local-glitch-text" data-text="Personal website; portfolio; dynamic gallery.">
-              Personal website; portfolio; dynamic gallery.
+              <div class="project-description local-glitch-text" data-text="Personal website; portfolio; dynamic gallery.">
+                Personal website; portfolio; dynamic gallery.
+              </div>
             </div>
-          </div>
+          </a>
+
+          <a href="#" class="project-link">
+            <div class="project" data-visual="placeholder">
+                <div class="project-number">#004</div>
+                <div id="project-title-4" class="project-title local-glitch-text" data-text="WIP: PLACEHOLDER">
+                    WIP: PLACEHOLDER
+                </div>
+                <div class="project-description local-glitch-text" data-text="A placeholder for a future project.">
+                    A placeholder for a future project.
+                </div>
+            </div>
+        </a>
+
         </div>
       </section>
     </div>
 
     <div class="visual-area">
-      <div class="dynamic-visual" id="dynamic-visual"></div>
+      <div class="dynamic-visual" id="dynamic-visual" data-state="default">
+        <div class="dynamic-visual-text visual-text-default">
+          <div class="dynamic-visual-title">[SYSTEM_READY]</div>
+          <div class="dynamic-visual-desc">Hover over a project to view details.</div>
+        </div>
+        <div class="dynamic-visual-text visual-text-hover">
+          <div class="dynamic-visual-title">[SYSTEM_INFO]</div>
+          <div class="dynamic-visual-desc">This panel dynamically displays information based on your selection.</div>
+        </div>
+      </div>
     </div>
   </div>
 
   <footer>
-    <span data-text="INDEX" class="local-glitch-text" style="opacity: 0.5; cursor: default;">INDEX</span>
-    <a href="contact.html" data-text="CONTACT" class="local-glitch-text">CONTACT</a>
-    <div data-text="© 2025 JORDAN" class="local-glitch-text">&copy; 2025 JORDAN</div>
+    <a href="index.html" class="footer-link-active" aria-current="page">INDEX</a>
+    <div class="footer-copyright">&copy; 2025 JORDAN</div>
+    <div class="footer-right-group">
+      <div class="theme-switcher-container">
+        <button id="theme-switcher-button" class="footer-link">THEME &gt;&gt;</button>
+        <div id="theme-dropdown" class="theme-dropdown-content">
+        </div>
+      </div>
+      <a href="contact.html" class="footer-link">CONTACT</a>
+    </div>
   </footer>
 
+  <script src="assets/js/theme-config.js"></script>
   <script src="assets/js/main.js"></script>
+  <script src="assets/js/theme.js"></script>
 </body>
 
 </html>

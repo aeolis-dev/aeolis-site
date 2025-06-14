@@ -1,0 +1,27 @@
+.theme-future {
+    --bg-primary: #04010d;
+    --bg-secondary: #0b061a;
+    --bg-tertiary: #130b29;
+
+    --accent-primary: #d900ff;
+    --accent-secondary: #00e1ff;
+    --accent-tertiary: #ff0073;
+    --accent-quaternary: #33334d;
+    --accent-success: #5bff00;
+    --accent-warning: #ffc400;
+
+    --text-primary: #f0e6ff;
+    --text-secondary: #c8bde0;
+    --text-highlight: #ffffff;
+    --text-technical: #f0e6ff;
+
+    --glass-primary: rgba(11, 6, 26, 0.6);
+    --glass-secondary: rgba(217, 0, 255, 0.1);
+    --glass-tertiary: rgba(0, 225, 255, 0.1);
+    --glass-accent: rgba(51, 51, 77, 0.2);
+    
+    --border-primary: rgba(217, 0, 255, 0.5);
+    --border-secondary: rgba(240, 230, 255, 0.25);
+    --border-accent: #00e1ff;
+    --border-hard: rgba(240, 230, 255, 0.8);
+} 

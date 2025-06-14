@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 
@@ -20,64 +21,53 @@
   <div class="content">
     <div class="main-area">
       <header>
-        <h2><a href="index.html"><span class="local-glitch-text" data-text="RETURN HOME">RETURN HOME</span></a></h2>
+        <h2><a href="index.html"><span class="local-glitch-text" data-text="&lt;&lt; RETURN TO INDEX">&lt;&lt; RETURN TO INDEX</span></a></h2>
+        <div class="theme-toggle">
+          <button id="theme-toggle-button">LIGHT &gt;&gt;</button>
+        </div>
       </header>
 
-      <section class="section" id="projects">
-        <div class="project-container">
-          <div class="project" data-visual="reptify">
+      <section class="section" id="project-details">
+        <div class="project" data-visual="reptify">
             <div class="project-number">#001</div>
             <div class="project-title local-glitch-text" data-text="Reptify Details">Reptify Details</div>
-            <div class="project-description local-glitch-text" data-text="Details about the Reptify project.">Details
-              about the Reptify project.</div>
-          </div>
-          
-          <div class="project" data-visual="placeholder1">
-            <div class="project-number">#002</div>
-            <div class="project-title local-glitch-text" data-text="Placeholder Details 1">
-              Placeholder Details 1
+            <div class="project-description local-glitch-text" data-text="This page provides a comprehensive overview of the Reptify mobile application, a tool designed for optimizing muscle hypertrophy. Explore the app's features, design philosophy, and the technology stack used in its development.">
+                This page provides a comprehensive overview of the Reptify mobile application, a tool designed for optimizing muscle hypertrophy. Explore the app's features, design philosophy, and the technology stack used in its development.
             </div>
-            <div class="project-description local-glitch-text" data-text="This is a placeholder project description.">
-              This is a placeholder project description.
-            </div>
-          </div>
-
-          <div class="project" data-visual="placeholder2">
-            <div class="project-number">#003</div>
-            <div class="project-title local-glitch-text" data-text="Placeholder Details 2">
-              Placeholder Details 2
-            </div>
-            <div class="project-description local-glitch-text"
-              data-text="This is another placeholder project description.">
-              This is another placeholder project description.
-            </div>
-          </div>
-
-          <div class="project" data-visual="placeholder3">
-            <div class="project-number">#004</div>
-            <div class="project-title local-glitch-text" data-text="Placeholder Details 3">
-              Placeholder Details 3
-            </div>
-            <div class="project-description local-glitch-text" data-text="Yet another placeholder project description.">
-              Yet another placeholder project description.
-            </div>
-          </div>
         </div>
       </section>
     </div>
 
     <div class="visual-area">
-      <div class="dynamic-visual" id="dynamic-visual"></div>
+      <div class="dynamic-visual reptify" id="dynamic-visual">
+        <div class="dynamic-visual-text visual-text-default">
+            <div class="dynamic-visual-title">[MOVEMENT OPTIMISATION]</div>
+            <div class="dynamic-visual-desc">A streamlined mobile workout app for optimising muscle hypertrophy.</div>
+        </div>
+        <div class="dynamic-visual-text visual-text-hover">
+            <div class="dynamic-visual-title">[TECHNICAL FOCUS]</div>
+            <div class="dynamic-visual-desc">React Native, TypeScript, Redux, Node.js backend.</div>
+        </div>
+      </div>
     </div>
   </div>
 
   <footer>
-    <a href="index.html" data-text="INDEX" class="local-glitch-text">INDEX</a>
-    <a href="contact.html" data-text="CONTACT" class="local-glitch-text">CONTACT</a>
-    <div data-text="© 2025 JORDAN" class="local-glitch-text">&copy; 2025 JORDAN</div>
+    <a href="index.html" class="footer-link">&lt;&lt; RETURN TO INDEX</a>
+    <div class="footer-copyright">&copy; 2025 JORDAN</div>
+    <div class="footer-right-group">
+      <div class="theme-switcher-container">
+        <button id="theme-switcher-button" class="footer-link">THEME &gt;&gt;</button>
+        <div id="theme-dropdown" class="theme-dropdown-content">
+        </div>
+      </div>
+      <a href="contact.html" class="footer-link">CONTACT</a>
+    </div>
   </footer>
 
   <script src="assets/js/main.js"></script>
+  <script src="assets/js/theme-config.js"></script>
+  <script src="assets/js/theme.js"></script>
 </body>
 
 </html>
