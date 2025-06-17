@@ -51,11 +51,24 @@ document.addEventListener('DOMContentLoaded', () => {
     phoneNumberPlaceholder.setAttribute('data-text', phoneNumber);
   }
 
-  // Mouse-tracking glitch aura effect
-  document.addEventListener('mousemove', (e) => {
-    const mouseX = e.clientX;
-    const mouseY = e.clientY;
+  // -------------------------------------------------------------
+  // Performance-optimised unified mouse handler
+  // -------------------------------------------------------------
+  // 1. We collect the latest mouse coordinates for every pointer
+  //    movement but defer the expensive DOM work to the next
+  //    animation frame (≈ 16 ms on 60 Hz displays).  This ensures
+  //    that the heavy calculations run at most once per frame,
+  //    even if the OS dispatches dozens of `mousemove` events.
+  // 2. Glitch-aura and floating-title logic now run together,
+  //    avoiding duplicate layouts and style recalculations.
 
+  const floatingTitle = document.querySelector('.floating-title');
+  let mouseX = 0;
+  let mouseY = 0;
+  let rafId = null;
+
+  const updateMouseReactiveEffects = () => {
+    // ---------------- Glitch aura ----------------
     localGlitchElements.forEach(el => {
       const rect = el.getBoundingClientRect();
 
@@ -63,44 +76,48 @@ document.addEventListener('DOMContentLoaded', () => {
       const closestX = Math.max(rect.left, Math.min(mouseX, rect.right));
       const closestY = Math.max(rect.top, Math.min(mouseY, rect.bottom));
 
-      // Calculate distance from mouse to that closest point on the element's edge.
-      const distanceX = mouseX - closestX;
-      const distanceY = mouseY - closestY;
-      const distanceToRectEdge = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+      // Distance from the mouse to that point.
+      const distanceToRectEdge = Math.hypot(mouseX - closestX, mouseY - closestY);
 
-      // Check if the mouse cursor's circular aura overlaps the element.
       if (distanceToRectEdge <= glitchCircleRadius) {
         el.classList.add('glitch-active');
-        // Calculate proximity factor for more intense glitch when closer
-        const proximityFactor = Math.max(0, (glitchCircleRadius - distanceToRectEdge) / glitchCircleRadius);
-        el.style.setProperty('--glitch-intensity', proximityFactor * 1.5); // Amplify effect
+        const proximityFactor = (glitchCircleRadius - distanceToRectEdge) / glitchCircleRadius;
+        // Clamp & amplify
+        el.style.setProperty('--glitch-intensity', (Math.max(0, proximityFactor) * 1.5).toFixed(3));
       } else {
         el.classList.remove('glitch-active');
-        el.style.setProperty('--glitch-intensity', 0);
+        el.style.setProperty('--glitch-intensity', '0');
       }
     });
-  });
 
-  // Floating title animation based on mouse position
-  const floatingTitle = document.querySelector('.floating-title');
-  if (floatingTitle) {
-    document.addEventListener('mousemove', (e) => {
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
+    // --------------- Floating title --------------
+    if (floatingTitle) {
       const centerX = window.innerWidth / 2;
       const centerY = window.innerHeight / 2;
-      
-      // Calculate offset based on mouse position (parallax effect)
-      const offsetX = (mouseX - centerX) * 0.015; // Increased from 0.01
+
+      const offsetX = (mouseX - centerX) * 0.015;
       const offsetY = (mouseY - centerY) * 0.015;
-      
-      // Add subtle rotation based on mouse position
+
       const rotateX = (mouseY - centerY) * 0.01;
       const rotateY = (mouseX - centerX) * -0.01;
-      
-      floatingTitle.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) rotateX(${20 + rotateX}deg) rotateY(${-10 + rotateY}deg)`;
-    });
-  }
+
+      floatingTitle.style.transform =
+        `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px)) ` +
+        `rotateX(${20 + rotateX}deg) rotateY(${-10 + rotateY}deg)`;
+    }
+
+    // Allow the next frame to be scheduled
+    rafId = null;
+  };
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    // Only queue a frame if one isn't already pending
+    if (rafId === null) {
+      rafId = requestAnimationFrame(updateMouseReactiveEffects);
+    }
+  }, { passive: true });
 
   // Add periodic glitch effects to random elements
   setInterval(() => {
