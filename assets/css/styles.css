@@ -1,7 +1,5 @@
 /* TO DO:  Find performance issues */
-/* TO DO:  Have alternative dark and light themes */
 /* TO DO:  Change themes from dropdown to clickable squares somewhere on the page */
-/* TO DO:  Fix rotating cards */
 /* TO DO:  Change dark/light button to just text */
 /* TO DO:  Glassier elements */
 /* TO DO:  More depth */
@@ -10,8 +8,6 @@
 /* TO DO:  More interesting scrollbar, make width of project elements consistent with and without it */
 /* TO DO:  Contact page text is wrong */
 /* TO DO:  Less blur/soft edges, more hard and striking colours and elements */
-/* TO DO:  Start a new chat */
-/* TO DO:  Get rid of themes I don't like */
 
 /* ==========================================================================
    1. FONT IMPORTS & GLOBAL VARIABLES
@@ -242,7 +238,7 @@ body::after { /* Noise Overlay */
   content: '';
   position: absolute;
   inset: 0;
-  transition: all var(--animation-speed-medium) ease;
+  transition: opacity var(--animation-speed-medium) ease, background var(--animation-speed-medium) ease;
   z-index: 1;
 }
 
@@ -341,6 +337,10 @@ body::after { /* Noise Overlay */
     repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(148, 0, 211, 0.15) 30deg, transparent 60deg),
     radial-gradient(circle at 70% 30%, rgba(148, 0, 211, 0.2) 0%, transparent 50%);
   animation: soundwaveRipple 4s ease-in-out infinite;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
 }
 .dynamic-visual.megaherb .dynamic-visual-title {
   color: var(--accent-tertiary); 
@@ -352,6 +352,10 @@ body::after { /* Noise Overlay */
     repeating-linear-gradient(60deg, transparent, transparent 12px, rgba(75, 0, 130, 0.15) 12px, rgba(75, 0, 130, 0.15) 24px),
     repeating-linear-gradient(-60deg, transparent, transparent 12px, rgba(75, 0, 130, 0.1) 12px, rgba(75, 0, 130, 0.1) 24px);
   animation: dataCoreSpin 6s linear infinite;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
 }
 .dynamic-visual.aeolis .dynamic-visual-title { 
   color: var(--accent-quaternary); 
