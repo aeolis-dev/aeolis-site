@@ -460,28 +460,24 @@ h2 a:hover {
   transform: translateX(5px);
 }
 
-.theme-toggle {
-  /* No longer needs absolute positioning */
-}
-
 #theme-toggle-button {
-  background: var(--glass-secondary);
-  border: 1px solid var(--border-secondary);
-  color: var(--text-secondary);
-  padding: 0.5rem 1rem;
-  font-family: var(--font-technical);
-  font-size: 0.9rem;
-  border-radius: 4px;
+  /* Transform the button into glitch-styled headline text */
+  background: none;
+  border: none;
+  font-family: var(--font-main);
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
   cursor: pointer;
-  transition: all var(--animation-speed-fast) ease;
+  text-transform: uppercase;
   letter-spacing: 0.05em;
+  position: relative;
+  transition: color var(--animation-speed-fast) ease;
 }
 
 #theme-toggle-button:hover {
-  background: var(--glass-primary);
-  border-color: var(--border-primary);
-  color: var(--text-primary);
-  text-shadow: 0 0 5px var(--text-highlight);
+  color: var(--accent-primary);
+  text-shadow: 0 0 20px var(--accent-primary);
 }
 
 /* ==========================================================================
@@ -827,58 +823,55 @@ footer::before {
 }
 
 .theme-switcher-container {
-  position: relative;
-  display: inline-block;
+  display: none; /* Dropdown replaced by vertical selector */
 }
 
-#theme-switcher-button {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
+/* ==========================================================================
+   THEME SELECTOR SQUARES
+   ========================================================================== */
+
+.theme-selector-container {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 100;
+}
+
+.theme-square {
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--square-border, #000);
+  box-shadow: 0 0 4px var(--square-glow, #fff);
+  background-size: 100% 100%;
   cursor: pointer;
-  padding: 0;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  transition: transform 0.2s ease, border 0.2s ease, box-shadow 0.2s ease;
 }
 
-#theme-switcher-button:hover {
-  color: var(--text-primary);
-  text-shadow: 0 0 5px var(--accent-primary);
+.theme-square:hover {
+  transform: scale(1.15);
 }
 
-.theme-dropdown-content {
-  display: none;
-  position: absolute;
-  bottom: 100%; /* Position above the button */
-  right: 0;
-  background-color: var(--glass-primary);
-  backdrop-filter: blur(10px);
-  min-width: 160px;
-  border: 1px solid var(--border-primary);
-  z-index: 1000;
-  max-height: 200px;
-  overflow-y: auto;
-  animation: fadeIn 0.3s ease-out;
+.theme-square.selected {
+  transform: scale(1.15);
+  border-width: 2px;
+  box-shadow: 0 0 6px var(--square-glow, #fff);
 }
 
-.theme-dropdown-content.show {
-  display: block;
-}
-
-.theme-dropdown-content a {
+.theme-label {
+  margin-top: 8px;
+  font-family: var(--font-main);
+  font-size: 0.8rem;
   color: var(--text-secondary);
-  padding: 8px 12px;
-  text-decoration: none;
-  display: block;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
-
-.theme-dropdown-content a:hover {
-  background-color: var(--glass-secondary);
-  color: var(--text-primary);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  letter-spacing: 0.1em;
+  user-select: none;
+  pointer-events: none;
 }
 
 /* ==========================================================================
