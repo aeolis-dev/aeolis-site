@@ -40,7 +40,7 @@ window.addEventListener('load', () => {
 
 document.addEventListener('DOMContentLoaded', () => {
   const localGlitchElements = document.querySelectorAll('.local-glitch-text');
-  const glitchCircleRadius = 75; // Radius of the glitch aura around the mouse
+  const glitchCircleRadius = 75;
 
   // Display phone number if the placeholder and variable exist.
   // The 'phoneNumber' variable is expected from 'assets/js/config.js' (which is gitignored).
@@ -82,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (distanceToRectEdge <= glitchCircleRadius) {
         el.classList.add('glitch-active');
         const proximityFactor = (glitchCircleRadius - distanceToRectEdge) / glitchCircleRadius;
-        // Clamp & amplify
         el.style.setProperty('--glitch-intensity', (Math.max(0, proximityFactor) * 1.5).toFixed(3));
       } else {
         el.classList.remove('glitch-active');
@@ -90,14 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // --------------- Floating title --------------
     if (floatingTitle) {
       const centerX = window.innerWidth / 2;
       const centerY = window.innerHeight / 2;
-
       const offsetX = (mouseX - centerX) * 0.015;
       const offsetY = (mouseY - centerY) * 0.015;
-
       const rotateX = (mouseY - centerY) * 0.01;
       const rotateY = (mouseX - centerX) * -0.01;
 
@@ -106,14 +102,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `rotateX(${20 + rotateX}deg) rotateY(${-10 + rotateY}deg)`;
     }
 
-    // Allow the next frame to be scheduled
     rafId = null;
   };
 
   document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
-    // Only queue a frame if one isn't already pending
     if (rafId === null) {
       rafId = requestAnimationFrame(updateMouseReactiveEffects);
     }
@@ -124,9 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const randomElement = localGlitchElements[Math.floor(Math.random() * localGlitchElements.length)];
     if (randomElement && !randomElement.classList.contains('glitch-active')) {
       randomElement.classList.add('glitch-active');
-      randomElement.style.setProperty('--glitch-intensity', Math.random() * 0.4 + 0.2); // Random intensity
+      randomElement.style.setProperty('--glitch-intensity', Math.random() * 0.4 + 0.2);
       setTimeout(() => {
-        // Only remove if it wasn't activated by mouseover
         if (!randomElement.matches(':hover')) {
             randomElement.classList.remove('glitch-active');
             randomElement.style.setProperty('--glitch-intensity', 0);
@@ -147,7 +140,6 @@ if (aeolisTitle) {
   aeolisTitle.addEventListener('mouseover', () => {
     aeolisTitle.textContent = hoverText;
     aeolisTitle.setAttribute('data-text', hoverText);
-    // Add glitch effect
     aeolisTitle.classList.add('glitch-active');
     aeolisTitle.style.setProperty('--glitch-intensity', '1');
   });
@@ -155,7 +147,6 @@ if (aeolisTitle) {
   aeolisTitle.addEventListener('mouseout', () => {
     aeolisTitle.textContent = originalText;
     aeolisTitle.setAttribute('data-text', originalDataText);
-    // Remove glitch effect
     aeolisTitle.classList.remove('glitch-active');
     aeolisTitle.style.setProperty('--glitch-intensity', '0.5');
   });

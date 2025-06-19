@@ -4,19 +4,19 @@
     --bg-tertiary: #001053;
 
     --accent-primary: #00b4d8;
-    --accent-secondary: #0077b6;
+    --accent-secondary: #48cae4;
     --accent-tertiary: #03045e;
     --accent-quaternary: #90e0ef;
     --accent-success: #48cae4;
     --accent-warning: #ff6b6b;
 
     --text-primary: #caf0f8;
-    --text-secondary: #ade8f4;
+    --text-secondary: #d2f4ff;
     --text-highlight: #ffffff;
     --text-technical: #caf0f8;
 
-    --glass-primary: rgba(0, 10, 61, 0.5);
-    --glass-secondary: rgba(0, 180, 216, 0.15);
+    --glass-primary: rgba(0, 10, 61, 0.12);
+    --glass-secondary: rgba(0, 180, 216, 0.25);
     --glass-tertiary: rgba(144, 224, 239, 0.1);
     --glass-accent: rgba(3, 4, 94, 0.2);
 

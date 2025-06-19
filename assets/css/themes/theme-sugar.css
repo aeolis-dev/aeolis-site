@@ -11,12 +11,12 @@
     --accent-warning: #ff3c00;
 
     --text-primary: #f4f4f5;
-    --text-secondary: #d1d1d6;
+    --text-secondary: #e0e0e5;
     --text-highlight: #ffffff;
     --text-technical: #f4f4f5;
 
-    --glass-primary: rgba(27, 27, 30, 0.5);
-    --glass-secondary: rgba(255, 0, 92, 0.15);
+    --glass-primary: rgba(27, 27, 30, 0.12);
+    --glass-secondary: rgba(255, 0, 92, 0.25);
     --glass-tertiary: rgba(0, 247, 255, 0.1);
     --glass-accent: rgba(123, 0, 224, 0.15);
     

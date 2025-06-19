@@ -1,0 +1,27 @@
+.theme-sunrise {
+    --bg-primary: #FFF9F2;
+    --bg-secondary: #FFF3E0;
+    --bg-tertiary: #FFE0C1;
+
+    --accent-primary: #FFA726;
+    --accent-secondary: #FB8C00;
+    --accent-tertiary: #F06292;
+    --accent-quaternary: #BA68C8;
+    --accent-success: #81C784;
+    --accent-warning: #E57373;
+
+    --text-primary: #5D4037;
+    --text-secondary: #8D6E63;
+    --text-highlight: #FB8C00;
+    --text-technical: #6D4C41;
+
+    --glass-primary: rgba(255, 249, 242, 0.12);
+    --glass-secondary: rgba(255, 167, 38, 0.25);
+    --glass-tertiary: rgba(240, 98, 146, 0.15);
+    --glass-accent: rgba(186, 104, 200, 0.18);
+
+    --border-primary: rgba(255, 167, 38, 0.5);
+    --border-secondary: rgba(93, 64, 55, 0.25);
+    --border-accent: #FFA726;
+    --border-hard: rgba(93, 64, 55, 0.7);
+} 

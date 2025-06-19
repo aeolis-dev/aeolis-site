@@ -10,13 +10,13 @@
     --accent-success: #F1FAEE;
     --accent-warning: #E63946;
   
-    --text-primary: #F1FAEE;
-    --text-secondary: #FADBC5;
+    --text-primary: #FFFFFF;
+    --text-secondary: #FFEEDF;
     --text-highlight: #FF8C00;
     --text-technical: #FFB86F;
   
-    --glass-primary: rgba(74, 42, 105, 0.5);
-    --glass-secondary: rgba(255, 140, 0, 0.15);
+    --glass-primary: rgba(74, 42, 105, 0.12);
+    --glass-secondary: rgba(255, 140, 0, 0.25);
     --glass-tertiary: rgba(255, 69, 0, 0.1);
     --glass-accent: rgba(230, 57, 70, 0.2);
   

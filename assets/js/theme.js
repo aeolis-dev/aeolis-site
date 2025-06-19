@@ -1,7 +1,18 @@
+const themeConfig = {
+    'Default': { dark: 'default', light: 'aether' },
+    'Eclipse': { dark: 'eclipse', light: 'sunrise' },
+    'Inferno': { dark: 'inferno', light: 'desert' },
+    'Monolith': { dark: 'monolith', light: 'lavender' },
+    'Future': { dark: 'future', light: 'pastel' },
+    'Tropical': { dark: 'tropical', light: 'sky' },
+    'Sugar': { dark: 'sugar', light: 'sakura' }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const head = document.head;
     const themeToggleButton = document.getElementById('theme-toggle-button');
     const body = document.body;
+    const docEl = document.documentElement;
 
     /* --------------------------------------------------
        1.  Dynamically preload all theme stylesheets
@@ -29,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     -------------------------------------------------- */
     const removeThemeClasses = () => {
         body.className = body.className.replace(/theme-\S+/g, '').trim();
+        docEl.className = docEl.className.replace(/theme-\S+/g, '').trim();
     };
 
     const updateSquareVisualMode = () => {
@@ -49,13 +61,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!theme) return;
 
         removeThemeClasses();
-        body.classList.add(`theme-${theme[mode]}`);
+        const className = `theme-${theme[mode]}`;
+        body.classList.add(className);
+        docEl.classList.add(className);
 
         // Persist state
         currentThemeName = themeName;
         currentMode      = mode;
         localStorage.setItem('selectedTheme', themeName);
         localStorage.setItem('themeMode', mode);
+        localStorage.setItem('appliedThemeClass', theme[mode]);
 
         // Update header toggle text & glitch dataset
         if (themeToggleButton) {
@@ -172,6 +187,25 @@ document.addEventListener('DOMContentLoaded', () => {
         themeToggleButton.addEventListener('click', () => {
             const newMode = currentMode === 'dark' ? 'light' : 'dark';
             applyTheme(currentThemeName, newMode);
+        });
+
+        // Hover preview with slow transition
+        themeToggleButton.addEventListener('mouseenter', () => {
+            const previewMode = currentMode === 'dark' ? 'light' : 'dark';
+            const oldMode = currentMode;
+            const theme = themeConfig[currentThemeName];
+            removeThemeClasses();
+            const previewClass = `theme-${theme[previewMode]}`;
+            body.classList.add(previewClass);
+            docEl.classList.add(previewClass);
+            currentMode = previewMode;
+            updateSquareBackgrounds();
+            currentMode = oldMode;
+        });
+
+        themeToggleButton.addEventListener('mouseleave', () => {
+            applyTheme(currentThemeName, currentMode);
+            updateSquareBackgrounds();
         });
     }
 

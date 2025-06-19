@@ -15,8 +15,8 @@
     --text-highlight: #00BFFF;
     --text-technical: #E6E6FA;
 
-    --glass-primary: rgba(2, 4, 8, 0.5);
-    --glass-secondary: rgba(0, 191, 255, 0.1);
+    --glass-primary: rgba(2, 4, 8, 0.1);
+    --glass-secondary: rgba(0, 191, 255, 0.2);
     --glass-tertiary: rgba(255, 0, 255, 0.1);
     --glass-accent: rgba(75, 0, 130, 0.15);
 

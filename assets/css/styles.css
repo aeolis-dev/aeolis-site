@@ -1,6 +1,3 @@
-/* TO DO:  Find performance issues */
-/* TO DO:  Change themes from dropdown to clickable squares somewhere on the page */
-/* TO DO:  Change dark/light button to just text */
 /* TO DO:  Glassier elements */
 /* TO DO:  More depth */
 /* TO DO:  Background name text more visible, bring the glitching on top effect back */
@@ -8,6 +5,7 @@
 /* TO DO:  More interesting scrollbar, make width of project elements consistent with and without it */
 /* TO DO:  Contact page text is wrong */
 /* TO DO:  Less blur/soft edges, more hard and striking colours and elements */
+/* TO DO:  Fix scanlines */
 
 /* ==========================================================================
    1. FONT IMPORTS & GLOBAL VARIABLES
@@ -16,6 +14,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap');
 
 :root {
   --font-main: 'Rajdhani', 'Orbitron', sans-serif;
@@ -24,16 +23,32 @@
   --perspective-strong: 1000px;
   --perspective-moderate: 1500px;
 
-  --glitch-hue1: 0deg; /* Red shift for magenta */
-  --glitch-hue2: 180deg; /* Cyan shift */
+  --glitch-hue1: 0deg;
+  --glitch-hue2: 180deg;
   
-  --scanline-opacity: 0.06;  /* Increased from 0.03 */
-  --noise-opacity: 0.04;     /* Increased from 0.02 */
-  --grid-opacity: 0.08;      /* Increased from 0.05 */
+  --scanline-opacity: 0.06;
+  --noise-opacity: 0.04;
+  --grid-opacity: 0.08;
+
+  /* Colour transition tiers */
+  --transition-bg: 0.8s;
+  --transition-mid: 1.4s;
+  --transition-fore: 2s;
 
   --animation-speed-fast: 0.2s;
   --animation-speed-medium: 0.4s;
   --animation-speed-slow: 0.8s;
+}
+
+/* Global colour transitions */
+*, *::before, *::after {
+  transition-property: background-color, color, border-color;
+  transition-duration: var(--transition-mid);
+  transition-timing-function: ease;
+}
+
+body {
+  transition-duration: var(--transition-bg);
 }
 
 /* ==========================================================================
@@ -51,7 +66,7 @@
 }
 
 html, body {
-  height: 100%; /* Changed from 100vh to allow content to define height */
+  height: 100%;
   margin: 0;
   overflow: hidden; /* Prevent body scrollbars */
 }
@@ -103,7 +118,7 @@ body::after { /* Noise Overlay */
     0deg,
     transparent,
     transparent 3px,
-    rgba(75, 0, 130, var(--scanline-opacity)) 3px, /* Changed from green to Indigo */
+    rgba(75, 0, 130, var(--scanline-opacity)) 3px,
     rgba(75, 0, 130, var(--scanline-opacity)) 5px
   );
   animation: scanlinesMove 15s linear infinite;
@@ -131,7 +146,7 @@ body::after { /* Noise Overlay */
 }
 
 .glitch-scanlines::after {
-  display: none; /* Removed the distracting sub-glitch */
+  display: none;
 }
 
 /* ==========================================================================
@@ -176,7 +191,7 @@ body::after { /* Noise Overlay */
 .content {
   flex: 1 0 auto;
   position: relative;
-  padding: 2rem 3rem; /* Reduced padding for symmetry */
+  padding: 2rem 3rem;
   max-width: 1920px;
   margin: 0 auto;
   width: 100%;
@@ -201,7 +216,7 @@ body::after { /* Noise Overlay */
   flex: 1;
   min-width: 400px;
   max-width: 600px;
-  position: relative; /* No longer sticky */
+  position: relative;
   transform-style: preserve-3d;
   height: 100%; /* Fill the container */
 }
@@ -214,7 +229,7 @@ body::after { /* Noise Overlay */
   border-radius: 8px;
   overflow: hidden;
   background: var(--glass-primary);
-  backdrop-filter: blur(8px); /* Less blur */
+  backdrop-filter: blur(8px);
   transform: perspective(1000px) rotateX(2deg) rotateY(-1deg);
   box-shadow: 
     0 0 40px rgba(0, 191, 255, 0.15),
@@ -425,18 +440,18 @@ header::after {
 
 h2 { /* Main page subtitle */
   font-family: var(--font-main);
-  font-size: 2.2rem; /* Slightly smaller for space */
+  font-size: 2.2rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin: 0; /* Remove margin */
+  margin: 0;
   position: relative;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  line-height: 1.2; /* Reduced line height */
+  line-height: 1.2;
   filter: drop-shadow(0 0 10px rgba(0, 191, 255, 0.3));
 }
 
-h2::before { /* Decorative bracket/line */
+/* h2::before {  Decorative bracket/line 
   content: '';
   position: absolute;
   left: -2rem;
@@ -446,7 +461,7 @@ h2::before { /* Decorative bracket/line */
   height: 2px;
   background: linear-gradient(90deg, var(--accent-primary), transparent);
   box-shadow: 0 0 10px var(--accent-primary);
-}
+} */
 
 h2 a {
   color: inherit;
@@ -456,12 +471,10 @@ h2 a {
 
 h2 a:hover {
   color: var(--accent-primary);
-  text-shadow: 0 0 20px var(--accent-primary);
   transform: translateX(5px);
 }
 
 #theme-toggle-button {
-  /* Transform the button into glitch-styled headline text */
   background: none;
   border: none;
   font-family: var(--font-main);
@@ -493,7 +506,7 @@ section#projects {
 .project-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; /* Reduced gap */
+  gap: 1.5rem;
   position: relative;
   overflow-y: auto; /* Enable scroll on overflow */
   padding: 1.5rem; /* Uniform padding inside the container */
@@ -507,9 +520,8 @@ section#projects {
   height: 100%; /* Fill parent section */
 }
 
-/* Aesthetically consistent scrollbar */
 .project-container::-webkit-scrollbar {
-  width: 12px; /* Make scrollbar more visible */
+  width: 12px;
 }
 .project-container::-webkit-scrollbar-track {
   background: var(--bg-secondary);
@@ -531,7 +543,7 @@ section#projects {
     text-decoration: none;
     display: block;
     outline: none;
-    position: relative; /* For z-index context */
+    position: relative;
 }
 .project-link:focus-visible .project { /* Accessibility */
     border-color: var(--accent-secondary);
@@ -540,11 +552,11 @@ section#projects {
 
 .project {
   position: relative;
-  padding: 1.5rem; /* Reduced padding */
+  padding: 1.5rem;
   border: 1px solid var(--border-primary);
   border-radius: 12px;
   background: var(--glass-primary);
-  backdrop-filter: blur(12px); /* Glassier */
+  backdrop-filter: blur(12px);
   transition: all var(--animation-speed-medium) ease;
   transform: perspective(1000px) rotateX(1deg);
   box-shadow: 
@@ -606,10 +618,10 @@ section#projects {
 
 .project-title {
   font-family: var(--font-main);
-  font-size: 1.6rem; /* Slightly smaller */
+  font-size: 1.6rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 0.5rem; /* Increased margin */
+  margin-bottom: 0.5rem;
   transition: all var(--animation-speed-fast) ease;
   text-transform: uppercase;
   letter-spacing: 0.01em;
@@ -620,7 +632,6 @@ section#projects {
 
 .project-link:hover .project .project-title {
   color: var(--accent-primary);
-  text-shadow: 0 0 15px var(--accent-primary);
 }
 
 .project-title a {
@@ -632,7 +643,7 @@ section#projects {
 .project-description {
   font-size: 1rem;
   color: var(--text-secondary);
-  line-height: 1.5; /* Adjusted line height */
+  line-height: 1.5;
   font-weight: 400;
   letter-spacing: 0.01em;
   display: block; /* Ensure it takes full line */
@@ -641,7 +652,6 @@ section#projects {
   margin-top: 0.25rem; /* Add small top margin for separation */
 }
 
-/* New decorative element instead of corner accents */
 .project::after {
   content: '';
   position: absolute;
@@ -727,7 +737,6 @@ section#projects {
 .local-glitch-text.glitch-active::before,
 .local-glitch-text.glitch-active::after {
   opacity: var(--glitch-intensity);
-  /* The animation is now controlled by JS setting the intensity */
 }
 
 .project-link:hover .local-glitch-text::before,
@@ -749,13 +758,13 @@ footer {
   backdrop-filter: blur(15px);
   border-top: 1px solid var(--border-primary);
   display: flex;
-  justify-content: center; /* Center the content */
+  justify-content: center;
   align-items: center;
-  gap: 2rem; /* Add space between elements */
-  font-size: 1rem; /* Slightly larger font */
+  gap: 2rem;
+  font-size: 1rem;
   color: var(--text-secondary);
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
-  height: 5rem; /* Fixed height */
+  height: 5rem;
 }
 
 footer::before {
@@ -791,7 +800,6 @@ footer::before {
 
 .footer-link:hover {
   color: var(--text-highlight);
-  text-shadow: 0 0 10px var(--text-highlight);
   border-color: var(--border-primary);
   background: var(--glass-secondary);
   border-radius: 4px;
@@ -820,10 +828,6 @@ footer::before {
   display: flex;
   align-items: center;
   gap: 2rem;
-}
-
-.theme-switcher-container {
-  display: none; /* Dropdown replaced by vertical selector */
 }
 
 /* ==========================================================================
@@ -1082,4 +1086,11 @@ footer::before {
   .floating-title {
     font-size: clamp(4rem, 15vw, 10rem);
   }
+}
+
+.no-transitions,
+.no-transitions *,
+.no-transitions *::before,
+.no-transitions *::after {
+  transition: none !important;
 } 

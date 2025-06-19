@@ -4,7 +4,7 @@
     --bg-tertiary: #ffffff;
     
     --accent-primary: #87ceeb;
-    --accent-secondary: #add8e6;
+    --accent-secondary: #5ab0ff;
     --accent-tertiary: #f0e68c;
     --accent-quaternary: #4682b4;
     --accent-success: #3cb371;
@@ -15,8 +15,8 @@
     --text-highlight: #87ceeb;
     --text-technical: #2980b9;
   
-    --glass-primary: rgba(255, 255, 255, 0.6);
-    --glass-secondary: rgba(135, 206, 235, 0.15);
+    --glass-primary: rgba(255, 255, 255, 0.12);
+    --glass-secondary: rgba(135, 206, 235, 0.25);
     --glass-tertiary: rgba(173, 216, 230, 0.15);
     --glass-accent: rgba(70, 130, 180, 0.2);
   
