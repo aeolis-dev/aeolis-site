@@ -4,11 +4,7 @@ let reptifyVideoPlayer = null;
 let megaherbVideoPlayer = null;
 
 // Check if we're on the index page
-const isIndexPage = window.location.pathname.endsWith('index.html') || 
-                   window.location.pathname === '/' || 
-                   window.location.pathname.endsWith('/') ||
-                   window.location.pathname.endsWith('index') ||
-                   window.location.pathname === '/index';
+const isIndexPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/');
 
 // Global function to resize visual area based on content (INDEX PAGE ONLY)
 function resizeVisualArea(contentType = 'default', videoElement = null) {
