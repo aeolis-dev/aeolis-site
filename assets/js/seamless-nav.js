@@ -3,6 +3,7 @@ class SeamlessNav {
     this.cache = new Map();
     this.isNavigating = false;
     this.preloadedPages = new Set();
+    this.currentVideoPlayers = new Set(); // Track active video players
     
     this.init();
   }
@@ -61,13 +62,13 @@ class SeamlessNav {
            (href.endsWith('.html') || href === '/' || !href.includes('.'));
   }
 
-
-
   async preloadPage(url) {
     if (this.preloadedPages.has(url)) return;
     
     try {
-      const response = await fetch(url);
+      // Add cache-busting parameter to prevent stale cache issues
+      const cacheBuster = `?cb=${Date.now()}`;
+      const response = await fetch(url + cacheBuster);
       if (response.ok) {
         const html = await response.text();
         this.cache.set(url, html);
@@ -79,19 +80,70 @@ class SeamlessNav {
     }
   }
 
+  // Clean up all video players before navigation
+  cleanupVideoPlayers() {
+    console.log('Cleaning up video players before navigation');
+    
+    // Use the global cleanup function from main.js
+    if (window.cleanupAllVideoPlayers) {
+      window.cleanupAllVideoPlayers();
+    } else {
+      // Fallback cleanup if global function not available
+      // Clean up global video player instances
+      if (window.attackVectorVideoPlayer && !window.attackVectorVideoPlayer.isDestroyed) {
+        window.attackVectorVideoPlayer.destroy();
+        window.attackVectorVideoPlayer = null;
+      }
+      
+      if (window.reptifyVideoPlayer && !window.reptifyVideoPlayer.isDestroyed) {
+        window.reptifyVideoPlayer.destroy();
+        window.reptifyVideoPlayer = null;
+      }
+      
+      if (window.megaherbVideoPlayer && !window.megaherbVideoPlayer.isDestroyed) {
+        window.megaherbVideoPlayer.destroy();
+        window.megaherbVideoPlayer = null;
+      }
+      
+      // Clean up any video containers in the DOM
+      const videoContainers = document.querySelectorAll('.video-container');
+      videoContainers.forEach(container => {
+        container.remove();
+      });
+      
+      // Clear any existing video elements
+      const videoElements = document.querySelectorAll('video');
+      videoElements.forEach(video => {
+        video.pause();
+        video.removeAttribute('src');
+        video.load();
+      });
+    }
+  }
+
   async navigateTo(url) {
     if (this.isNavigating) return;
     this.isNavigating = true;
 
+    console.log(`Navigating to: ${url}`);
+
     try {
+      // Clean up video players before navigation
+      this.cleanupVideoPlayers();
+      
       // Get page content (from cache or fetch)
       let html = this.cache.get(url);
       
       if (!html) {
-        const response = await fetch(url);
+        // Add cache-busting parameter to prevent stale cache issues
+        const cacheBuster = `?cb=${Date.now()}`;
+        console.log(`Fetching fresh content from: ${url + cacheBuster}`);
+        const response = await fetch(url + cacheBuster);
         if (!response.ok) throw new Error(`Failed to load ${url}`);
         html = await response.text();
         this.cache.set(url, html);
+      } else {
+        console.log(`Using cached content for: ${url}`);
       }
 
       // Parse the new page
@@ -105,11 +157,15 @@ class SeamlessNav {
 
       if (!newContent) throw new Error('Invalid page structure');
 
+      console.log(`Swapping content for: ${url}`);
+
       // Update page content with smooth transition
       await this.swapContent(newContent, newFloatingTitle, newTitle, url);
 
       // Update browser history
       history.pushState({ url }, '', url);
+
+      console.log(`Navigation completed: ${url}`);
 
     } catch (error) {
       console.error('Navigation failed:', error);

@@ -840,24 +840,61 @@ body:not(.index-page) .project {
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border-primary) transparent;
+  max-height: calc(100vh - 300px); /* Ensure scrollable area */
 }
 
-/* Custom scrollbar styling for project containers */
+/* Custom scrollbar styling for project containers - enhanced visibility */
 body:not(.index-page) .project::-webkit-scrollbar {
-  width: 6px;
+  width: 8px; /* Slightly wider for better visibility */
 }
 
 body:not(.index-page) .project::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
 }
 
 body:not(.index-page) .project::-webkit-scrollbar-thumb {
   background: var(--border-primary);
-  border-radius: 3px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 body:not(.index-page) .project::-webkit-scrollbar-thumb:hover {
   background: var(--accent-primary);
+  box-shadow: 0 0 8px rgba(0, 191, 255, 0.3);
+}
+
+/* Ensure project descriptions are properly styled on subpages */
+body:not(.index-page) .project-description {
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  opacity: 1 !important; /* Force opacity to prevent disappearing */
+  visibility: visible !important; /* Force visibility */
+}
+
+body:not(.index-page) .project-description:last-child {
+  margin-bottom: 0;
+}
+
+/* Ensure text remains visible during hover states */
+body:not(.index-page) .project-description:hover {
+  color: var(--text-primary);
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Ensure local-glitch-text elements remain visible on subpages */
+body:not(.index-page) .local-glitch-text {
+  color: var(--text-primary);
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+body:not(.index-page) .local-glitch-text:hover {
+  color: var(--text-primary);
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 body:not(.index-page) .dynamic-visual-text {
