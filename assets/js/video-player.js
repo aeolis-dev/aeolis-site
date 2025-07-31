@@ -98,9 +98,6 @@ class VideoPlayer {
     // Set up intersection observer for performance
     this.setupVisibilityObserver();
     
-    // Set up page visibility observer
-    this.setupPageVisibilityObserver();
-    
     this.container.appendChild(this.video);
     this.container.appendChild(this.imageElement);
     this.initialized = true;
@@ -124,21 +121,6 @@ class VideoPlayer {
     );
     
     this.intersectionObserver.observe(this.container);
-  }
-
-  setupPageVisibilityObserver() {
-    // Pause video when page is not visible
-    const handleVisibilityChange = () => {
-      if (document.hidden && this.isPlaying) {
-        console.log('Page not visible, pausing video for performance');
-        this.pause();
-      }
-    };
-    
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    // Store the handler for cleanup
-    this.visibilityHandler = handleVisibilityChange;
   }
 
   isCurrentItemVideo() {
@@ -382,12 +364,6 @@ class VideoPlayer {
       this.intersectionObserver = null;
     }
     
-    // Clean up page visibility handler
-    if (this.visibilityHandler) {
-      document.removeEventListener('visibilitychange', this.visibilityHandler);
-      this.visibilityHandler = null;
-    }
-    
     // Clear image timer
     if (this.imageTimer) {
       clearTimeout(this.imageTimer);
@@ -406,6 +382,16 @@ class VideoPlayer {
       this.imageElement.removeAttribute('src');
       this.imageElement.remove();
       this.imageElement = null;
+    }
+    
+    // Remove from seamless nav tracking if it exists
+    if (window.seamlessNav && window.seamlessNav.activeVideoPlayers) {
+      for (const [key, player] of window.seamlessNav.activeVideoPlayers.entries()) {
+        if (player === this) {
+          window.seamlessNav.activeVideoPlayers.delete(key);
+          break;
+        }
+      }
     }
     
     this.initialized = false;

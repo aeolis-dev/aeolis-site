@@ -6,40 +6,6 @@ let megaherbVideoPlayer = null;
 // Check if we're on the index page
 const isIndexPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/');
 
-// Global function to clean up all video players
-function cleanupAllVideoPlayers() {
-  console.log('Cleaning up all video players');
-  
-  if (attackVectorVideoPlayer && !attackVectorVideoPlayer.isDestroyed) {
-    attackVectorVideoPlayer.destroy();
-    attackVectorVideoPlayer = null;
-  }
-  
-  if (reptifyVideoPlayer && !reptifyVideoPlayer.isDestroyed) {
-    reptifyVideoPlayer.destroy();
-    reptifyVideoPlayer = null;
-  }
-  
-  if (megaherbVideoPlayer && !megaherbVideoPlayer.isDestroyed) {
-    megaherbVideoPlayer.destroy();
-    megaherbVideoPlayer = null;
-  }
-  
-  // Clean up any video containers in the DOM
-  const videoContainers = document.querySelectorAll('.video-container');
-  videoContainers.forEach(container => {
-    container.remove();
-  });
-  
-  // Clear any existing video elements
-  const videoElements = document.querySelectorAll('video');
-  videoElements.forEach(video => {
-    video.pause();
-    video.removeAttribute('src');
-    video.load();
-  });
-}
-
 // Global function to resize visual area based on content (INDEX PAGE ONLY)
 function resizeVisualArea(contentType = 'default', videoElement = null) {
   // Only resize on index page
@@ -799,9 +765,6 @@ window.initializePageScripts = function() {
   document.dispatchEvent(event);
 };
 
-// Export cleanup function for seamless navigation
-window.cleanupAllVideoPlayers = cleanupAllVideoPlayers;
-
 // Function to initialize and auto-play video on attackvector page
 window.initializeAttackVectorVideo = async function initializeAttackVectorVideo() {
   const dynamicVisual = document.getElementById('dynamic-visual');
@@ -843,6 +806,11 @@ window.initializeAttackVectorVideo = async function initializeAttackVectorVideo(
       gapDuration: 200,
       loop: true
     });
+    
+    // Track this video player for cleanup
+    if (window.seamlessNav && window.seamlessNav.activeVideoPlayers) {
+      window.seamlessNav.activeVideoPlayers.set('attackvector', attackVectorVideoPlayer);
+    }
     
     await attackVectorVideoPlayer.init();
     
@@ -945,6 +913,11 @@ window.initializeReptifyVideo = async function initializeReptifyVideo() {
       loop: true,
       imageDuration: 1500 // 1.5 seconds per image
     });
+    
+    // Track this video player for cleanup
+    if (window.seamlessNav && window.seamlessNav.activeVideoPlayers) {
+      window.seamlessNav.activeVideoPlayers.set('reptify', reptifyVideoPlayer);
+    }
     
     await reptifyVideoPlayer.init();
     
@@ -1051,6 +1024,11 @@ window.initializeMegaherbVideo = async function initializeMegaherbVideo() {
       imageDuration: 2000 // 2 seconds per image
     });
     
+    // Track this video player for cleanup
+    if (window.seamlessNav && window.seamlessNav.activeVideoPlayers) {
+      window.seamlessNav.activeVideoPlayers.set('megaherb', megaherbVideoPlayer);
+    }
+    
     await megaherbVideoPlayer.init();
     
     // Auto-play the slideshow
@@ -1111,13 +1089,13 @@ window.initializeMegaherbVideo = async function initializeMegaherbVideo() {
 
 // Clean up video player on page unload
 window.addEventListener('beforeunload', () => {
-  cleanupAllVideoPlayers();
-});
-
-// Global page visibility handler to pause all videos when page is hidden
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    console.log('Page hidden, pausing all video players');
-    cleanupAllVideoPlayers();
+  if (attackVectorVideoPlayer) {
+    attackVectorVideoPlayer.destroy();
+  }
+  if (reptifyVideoPlayer) {
+    reptifyVideoPlayer.destroy();
+  }
+  if (megaherbVideoPlayer) {
+    megaherbVideoPlayer.destroy();
   }
 }); 

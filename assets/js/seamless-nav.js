@@ -3,7 +3,7 @@ class SeamlessNav {
     this.cache = new Map();
     this.isNavigating = false;
     this.preloadedPages = new Set();
-    this.currentVideoPlayers = new Set(); // Track active video players
+    this.activeVideoPlayers = new Map(); // Track active video players
     
     this.init();
   }
@@ -21,6 +21,21 @@ class SeamlessNav {
     this.interceptLinks();
     this.setupHoverPreloading();
     this.handleBrowserNavigation();
+    this.normalizeCurrentURL(); // Normalize URL on page load
+    
+    // Ensure proper initialization on direct page load
+    this.initializeCurrentPage();
+  }
+
+  normalizeCurrentURL() {
+    // Remove .html extension from current URL if it's the index page
+    const currentPath = window.location.pathname;
+    if (currentPath.endsWith('/index.html') || currentPath.endsWith('/index')) {
+      const newPath = currentPath.replace(/\/index\.html?$/, '/');
+      if (newPath !== currentPath) {
+        history.replaceState({ url: newPath }, '', newPath);
+      }
+    }
   }
 
   interceptLinks() {
@@ -62,62 +77,28 @@ class SeamlessNav {
            (href.endsWith('.html') || href === '/' || !href.includes('.'));
   }
 
-  async preloadPage(url) {
-    if (this.preloadedPages.has(url)) return;
-    
-    try {
-      // Add cache-busting parameter to prevent stale cache issues
-      const cacheBuster = `?cb=${Date.now()}`;
-      const response = await fetch(url + cacheBuster);
-      if (response.ok) {
-        const html = await response.text();
-        this.cache.set(url, html);
-        this.preloadedPages.add(url);
-        console.log(`Preloaded: ${url}`);
-      }
-    } catch (error) {
-      console.warn(`Failed to preload ${url}:`, error);
+  normalizeURL(url) {
+    // Normalize URLs to remove .html extension for index page
+    if (url.endsWith('/index.html') || url.endsWith('/index')) {
+      return url.replace(/\/index\.html?$/, '/');
     }
+    return url;
   }
 
-  // Clean up all video players before navigation
-  cleanupVideoPlayers() {
-    console.log('Cleaning up video players before navigation');
+  async preloadPage(url) {
+    const normalizedUrl = this.normalizeURL(url);
+    if (this.preloadedPages.has(normalizedUrl)) return;
     
-    // Use the global cleanup function from main.js
-    if (window.cleanupAllVideoPlayers) {
-      window.cleanupAllVideoPlayers();
-    } else {
-      // Fallback cleanup if global function not available
-      // Clean up global video player instances
-      if (window.attackVectorVideoPlayer && !window.attackVectorVideoPlayer.isDestroyed) {
-        window.attackVectorVideoPlayer.destroy();
-        window.attackVectorVideoPlayer = null;
+    try {
+      const response = await fetch(normalizedUrl);
+      if (response.ok) {
+        const html = await response.text();
+        this.cache.set(normalizedUrl, html);
+        this.preloadedPages.add(normalizedUrl);
+        console.log(`Preloaded: ${normalizedUrl}`);
       }
-      
-      if (window.reptifyVideoPlayer && !window.reptifyVideoPlayer.isDestroyed) {
-        window.reptifyVideoPlayer.destroy();
-        window.reptifyVideoPlayer = null;
-      }
-      
-      if (window.megaherbVideoPlayer && !window.megaherbVideoPlayer.isDestroyed) {
-        window.megaherbVideoPlayer.destroy();
-        window.megaherbVideoPlayer = null;
-      }
-      
-      // Clean up any video containers in the DOM
-      const videoContainers = document.querySelectorAll('.video-container');
-      videoContainers.forEach(container => {
-        container.remove();
-      });
-      
-      // Clear any existing video elements
-      const videoElements = document.querySelectorAll('video');
-      videoElements.forEach(video => {
-        video.pause();
-        video.removeAttribute('src');
-        video.load();
-      });
+    } catch (error) {
+      console.warn(`Failed to preload ${normalizedUrl}:`, error);
     }
   }
 
@@ -125,25 +106,21 @@ class SeamlessNav {
     if (this.isNavigating) return;
     this.isNavigating = true;
 
-    console.log(`Navigating to: ${url}`);
-
     try {
-      // Clean up video players before navigation
-      this.cleanupVideoPlayers();
+      const normalizedUrl = this.normalizeURL(url);
+      console.log(`Navigating to: ${url} (normalized: ${normalizedUrl})`);
+      
+      // Clean up any active video players before navigation
+      this.cleanupActiveVideos();
       
       // Get page content (from cache or fetch)
-      let html = this.cache.get(url);
+      let html = this.cache.get(normalizedUrl);
       
       if (!html) {
-        // Add cache-busting parameter to prevent stale cache issues
-        const cacheBuster = `?cb=${Date.now()}`;
-        console.log(`Fetching fresh content from: ${url + cacheBuster}`);
-        const response = await fetch(url + cacheBuster);
-        if (!response.ok) throw new Error(`Failed to load ${url}`);
+        const response = await fetch(normalizedUrl);
+        if (!response.ok) throw new Error(`Failed to load ${normalizedUrl}`);
         html = await response.text();
-        this.cache.set(url, html);
-      } else {
-        console.log(`Using cached content for: ${url}`);
+        this.cache.set(normalizedUrl, html);
       }
 
       // Parse the new page
@@ -157,15 +134,13 @@ class SeamlessNav {
 
       if (!newContent) throw new Error('Invalid page structure');
 
-      console.log(`Swapping content for: ${url}`);
-
       // Update page content with smooth transition
-      await this.swapContent(newContent, newFloatingTitle, newTitle, url);
+      await this.swapContent(newContent, newFloatingTitle, newTitle, normalizedUrl);
 
-      // Update browser history
-      history.pushState({ url }, '', url);
-
-      console.log(`Navigation completed: ${url}`);
+      // Update browser history with normalized URL
+      history.pushState({ url: normalizedUrl }, '', normalizedUrl);
+      
+      console.log(`Navigation completed successfully to: ${normalizedUrl}`);
 
     } catch (error) {
       console.error('Navigation failed:', error);
@@ -173,6 +148,31 @@ class SeamlessNav {
       window.location.href = url;
     } finally {
       this.isNavigating = false;
+    }
+  }
+
+  cleanupActiveVideos() {
+    // Stop and destroy all active video players
+    this.activeVideoPlayers.forEach((player, key) => {
+      if (player && typeof player.destroy === 'function') {
+        console.log(`Cleaning up video player: ${key}`);
+        player.destroy();
+      }
+    });
+    this.activeVideoPlayers.clear();
+    
+    // Also clean up any global video players
+    if (window.reptifyVideoPlayer && typeof window.reptifyVideoPlayer.destroy === 'function') {
+      window.reptifyVideoPlayer.destroy();
+      window.reptifyVideoPlayer = null;
+    }
+    if (window.attackVectorVideoPlayer && typeof window.attackVectorVideoPlayer.destroy === 'function') {
+      window.attackVectorVideoPlayer.destroy();
+      window.attackVectorVideoPlayer = null;
+    }
+    if (window.megaherbVideoPlayer && typeof window.megaherbVideoPlayer.destroy === 'function') {
+      window.megaherbVideoPlayer.destroy();
+      window.megaherbVideoPlayer = null;
     }
   }
 
@@ -215,6 +215,20 @@ class SeamlessNav {
       document.title = newTitle.textContent;
     }
 
+    // Update body class for page-specific styling
+    body.className = '';
+    if (url.includes('reptify')) {
+      body.classList.add('reptify-page');
+    } else if (url.includes('attackvector')) {
+      body.classList.add('attackvector-page');
+    } else if (url.includes('megaherb')) {
+      body.classList.add('megaherb-page');
+    } else if (url.includes('contact')) {
+      body.classList.add('contact-page');
+    } else {
+      body.classList.add('index-page');
+    }
+
     // Restore theme classes if they were lost
     currentThemeClasses.forEach(cls => {
       if (!docEl.classList.contains(cls)) {
@@ -227,6 +241,9 @@ class SeamlessNav {
         body.classList.add(cls);
       }
     });
+
+    // Force CSS reapplication by triggering a reflow
+    this.forceCSSReflow();
 
     // Update visual area for new page and set appropriate size
     this.updateVisualAreaForPage(url);
@@ -252,6 +269,17 @@ class SeamlessNav {
     
     await this.wait(50);
     document.body.classList.remove('navigating');
+  }
+
+  forceCSSReflow() {
+    // Force browser to recalculate styles by triggering a reflow
+    const body = document.body;
+    const forceReflow = body.offsetHeight;
+    // Trigger a small style change to force CSS recalculation
+    body.style.transform = 'translateZ(0)';
+    setTimeout(() => {
+      body.style.transform = '';
+    }, 10);
   }
 
   updateVisualAreaForPage(url) {
@@ -327,14 +355,51 @@ class SeamlessNav {
     if (window.themeSystem && window.themeSystem.reinitialize) {
       window.themeSystem.reinitialize();
     }
+    
+    // Force a small delay to ensure all scripts are properly initialized
+    setTimeout(() => {
+      // Trigger any pending style recalculations
+      this.forceCSSReflow();
+    }, 50);
   }
 
   handleBrowserNavigation() {
     window.addEventListener('popstate', (e) => {
       if (e.state && e.state.url) {
         this.navigateTo(e.state.url);
+      } else {
+        // Handle direct URL access (back/forward buttons)
+        const currentPath = window.location.pathname;
+        this.navigateTo(currentPath);
       }
     });
+    
+    // Also handle beforeunload to clean up videos when leaving the page
+    window.addEventListener('beforeunload', () => {
+      this.cleanupActiveVideos();
+    });
+  }
+
+  initializeCurrentPage() {
+    // Set proper body class for current page
+    const body = document.body;
+    const currentPath = window.location.pathname;
+    
+    body.className = '';
+    if (currentPath.includes('reptify')) {
+      body.classList.add('reptify-page');
+    } else if (currentPath.includes('attackvector')) {
+      body.classList.add('attackvector-page');
+    } else if (currentPath.includes('megaherb')) {
+      body.classList.add('megaherb-page');
+    } else if (currentPath.includes('contact')) {
+      body.classList.add('contact-page');
+    } else {
+      body.classList.add('index-page');
+    }
+    
+    // Force CSS reflow to ensure proper styling
+    this.forceCSSReflow();
   }
 
   getCurrentPage() {
@@ -378,6 +443,81 @@ style.textContent = `
   
   body.navigating {
     transition-duration: var(--transition-bg, 0.8s) !important;
+  }
+  
+  /* Ensure proper scrollbar styling after navigation */
+  body:not(.index-page) .project,
+  body.reptify-page .project,
+  body.attackvector-page .project,
+  body.megaherb-page .project,
+  body.contact-page .project {
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: var(--border-primary) transparent !important;
+  }
+  
+  body:not(.index-page) .project::-webkit-scrollbar,
+  body.reptify-page .project::-webkit-scrollbar,
+  body.attackvector-page .project::-webkit-scrollbar,
+  body.megaherb-page .project::-webkit-scrollbar,
+  body.contact-page .project::-webkit-scrollbar {
+    width: 6px !important;
+  }
+  
+  body:not(.index-page) .project::-webkit-scrollbar-track,
+  body.reptify-page .project::-webkit-scrollbar-track,
+  body.attackvector-page .project::-webkit-scrollbar-track,
+  body.megaherb-page .project::-webkit-scrollbar-track,
+  body.contact-page .project::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+  
+  body:not(.index-page) .project::-webkit-scrollbar-thumb,
+  body.reptify-page .project::-webkit-scrollbar-thumb,
+  body.attackvector-page .project::-webkit-scrollbar-thumb,
+  body.megaherb-page .project::-webkit-scrollbar-thumb,
+  body.contact-page .project::-webkit-scrollbar-thumb {
+    background: var(--border-primary) !important;
+    border-radius: 3px !important;
+  }
+  
+  body:not(.index-page) .project::-webkit-scrollbar-thumb:hover,
+  body.reptify-page .project::-webkit-scrollbar-thumb:hover,
+  body.attackvector-page .project::-webkit-scrollbar-thumb:hover,
+  body.megaherb-page .project::-webkit-scrollbar-thumb:hover,
+  body.contact-page .project::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-primary) !important;
+  }
+  
+  /* Ensure text visibility after navigation */
+  body:not(.index-page) .project-description.local-glitch-text,
+  body.reptify-page .project-description.local-glitch-text,
+  body.attackvector-page .project-description.local-glitch-text,
+  body.megaherb-page .project-description.local-glitch-text,
+  body.contact-page .project-description.local-glitch-text {
+    color: var(--text-primary) !important;
+    transition: none !important;
+  }
+  
+  body:not(.index-page) .project-description.local-glitch-text:hover,
+  body.reptify-page .project-description.local-glitch-text:hover,
+  body.attackvector-page .project-description.local-glitch-text:hover,
+  body.megaherb-page .project-description.local-glitch-text:hover,
+  body.contact-page .project-description.local-glitch-text:hover {
+    color: var(--text-primary) !important;
+  }
+  
+  body:not(.index-page) .project-description.local-glitch-text::before,
+  body:not(.index-page) .project-description.local-glitch-text::after,
+  body.reptify-page .project-description.local-glitch-text::before,
+  body.reptify-page .project-description.local-glitch-text::after,
+  body.attackvector-page .project-description.local-glitch-text::before,
+  body.attackvector-page .project-description.local-glitch-text::after,
+  body.megaherb-page .project-description.local-glitch-text::before,
+  body.megaherb-page .project-description.local-glitch-text::after,
+  body.contact-page .project-description.local-glitch-text::before,
+  body.contact-page .project-description.local-glitch-text::after {
+    display: none !important;
   }
 `;
 document.head.appendChild(style);

@@ -94,6 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 themeToggleButton.textContent = mode === 'dark' ? 'LIGHT >>' : 'DARK >>';
                 themeToggleButton.dataset.text = themeToggleButton.textContent;
                 themeToggleButton.classList.add('local-glitch-text');
+                
+                // Ensure the button is properly styled after navigation
+                themeToggleButton.style.color = 'var(--text-primary)';
+                themeToggleButton.style.transition = 'color 0.8s ease';
             }
 
             updateSquareVisualMode();
@@ -246,4 +250,26 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         window.addEventListener('load', updateSquareBackgrounds);
     }
+    
+    /* --------------------------------------------------
+       7. Reinitialize function for seamless navigation
+    -------------------------------------------------- */
+    window.themeSystem = {
+        reinitialize: () => {
+            // Reapply current theme to ensure proper styling after navigation
+            applyTheme(currentThemeName, currentMode);
+            updateSquareBackgrounds();
+            
+            // Reattach event listeners if needed
+            const themeToggleButton = document.getElementById('theme-toggle-button');
+            if (themeToggleButton && !themeToggleButton.hasAttribute('data-listener-attached')) {
+                themeToggleButton.setAttribute('data-listener-attached', 'true');
+                
+                themeToggleButton.addEventListener('click', () => {
+                    const newMode = currentMode === 'dark' ? 'light' : 'dark';
+                    applyTheme(currentThemeName, newMode);
+                });
+            }
+        }
+    };
 }); 
