@@ -2,5 +2,6 @@
 *.log
 .DS_Store
 node_modules/
-assets/js/config.js
 .cursor/
+.venv/
+.vscode/

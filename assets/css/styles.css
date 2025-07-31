@@ -6,15 +6,14 @@
 /* TO DO:  Contact page text is wrong */
 /* TO DO:  Less blur/soft edges, more hard and striking colours and elements */
 /* TO DO:  Fix scanlines */
+/* TO DO:  Some themes still don't have good contrast */
+/* TO DO:  Return to index button in footer of child pages is wrong */
 
 /* ==========================================================================
    1. FONT IMPORTS & GLOBAL VARIABLES
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap');
+/* Fonts are now loaded in HTML for better performance and caching */
 
 :root {
   --font-main: 'Rajdhani', 'Orbitron', sans-serif;
@@ -26,7 +25,7 @@
   --glitch-hue1: 0deg;
   --glitch-hue2: 180deg;
   
-  --scanline-opacity: 0.06;
+  --scanline-opacity: 0.1;
   --noise-opacity: 0.04;
   --grid-opacity: 0.08;
 
@@ -42,13 +41,17 @@
 
 /* Global colour transitions */
 *, *::before, *::after {
-  transition-property: background-color, color, border-color;
+  transition-property: background-color, color, border-color, background;
   transition-duration: var(--transition-mid);
   transition-timing-function: ease;
 }
 
 body {
   transition-duration: var(--transition-bg);
+  /* Explicit transitions for reliable theme switching */
+  transition: 
+    background-color 0.8s ease,
+    color 0.8s ease !important;
 }
 
 /* ==========================================================================
@@ -95,7 +98,6 @@ body::before { /* Background Grid */
     linear-gradient(-45deg, rgba(255, 0, 255, 0.02) 25%, transparent 25%);
   background-size: 100px 100px, 100px 100px, 50px 50px, 50px 50px;
   opacity: var(--grid-opacity);
-  animation: bgGridPulse 20s linear infinite alternate;
   z-index: 1;
   pointer-events: none;
 }
@@ -106,14 +108,16 @@ body::after { /* Noise Overlay */
   inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   opacity: var(--noise-opacity);
-  animation: noiseShift 5s steps(10) infinite;
   z-index: 3;
   pointer-events: none;
 }
 
 .scanline-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 5rem; /* Exclude footer area */
   background: repeating-linear-gradient(
     0deg,
     transparent,
@@ -121,13 +125,12 @@ body::after { /* Noise Overlay */
     rgba(75, 0, 130, var(--scanline-opacity)) 3px,
     rgba(75, 0, 130, var(--scanline-opacity)) 5px
   );
-  animation: scanlinesMove 15s linear infinite;
   z-index: 2;
   pointer-events: none;
 }
 
-/* Top accent bar - limited animation */
-.glitch-scanlines {
+/* Top loading bar - exponential velocity */
+.loading-bar {
   position: fixed;
   top: 0;
   left: 0;
@@ -138,14 +141,14 @@ body::after { /* Noise Overlay */
     var(--accent-primary) 30%, 
     var(--accent-secondary) 70%, 
     transparent 100%);
-  /* Animate twice then fade out */
-  animation: dataStreamFlow 1.5s linear 2, fadeOut 1s 3s forwards;
+  /* Single exponential animation */
+  animation: exponentialCurve 1s linear 1 forwards;
   z-index: 100;
   pointer-events: none;
   opacity: 0.8;
 }
 
-.glitch-scanlines::after {
+.loading-bar::after {
   display: none;
 }
 
@@ -173,7 +176,7 @@ body::after { /* Noise Overlay */
   -webkit-background-clip: text;
   z-index: 5;
   pointer-events: none;
-  animation: titleDrift 20s ease-in-out infinite alternate, titleColorCycle 30s linear infinite;
+  animation: titleDrift 60s steps(120) infinite alternate, titleColorCycle 30s steps(30) infinite;
   text-shadow: 
     0 0 15px rgba(0, 191, 255, 0.2),
     0 0 30px rgba(0, 191, 255, 0.1),
@@ -202,6 +205,14 @@ body::after { /* Noise Overlay */
   height: calc(100vh - 5rem); /* Full height minus footer */
 }
 
+.visual-area-container {
+  display: flex;
+  align-items: center; /* Center the visual area vertically */
+  justify-content: center; /* Center the visual area horizontally */
+  flex: 1;
+  min-width: 0; /* Allow shrinking */
+}
+
 .main-area {
   flex: 2;
   max-width: 1000px;
@@ -213,12 +224,35 @@ body::after { /* Noise Overlay */
 }
 
 .visual-area {
-  flex: 1;
-  min-width: 400px;
-  max-width: 600px;
+  width: 100%; /* Responsive width */
+  max-width: 600px; /* Maximum width */
+  min-width: 300px; /* Minimum width */
+  height: 400px; /* Default height */
   position: relative;
   transform-style: preserve-3d;
-  height: 100%; /* Fill the container */
+  transition: height var(--animation-speed-medium) ease, width var(--animation-speed-medium) ease;
+  flex-shrink: 1; /* Allow shrinking */
+}
+
+/* Fixed sizes for sub-pages - no dynamic resizing */
+.visual-area.fixed-size {
+  transition: height 0.3s ease, opacity 0.3s ease;
+}
+
+/* Dynamic sizing states - only height changes, width stays at 600px (INDEX PAGE ONLY) */
+.visual-area.content-fit {
+  /* Default height */
+  height: 400px;
+}
+
+.visual-area.video-fit {
+  /* Height and width will be set by JavaScript based on video aspect ratio */
+  /* Allows dynamic sizing to fit video properly */
+}
+
+.visual-area.image-fit {
+  /* Height will be set by JavaScript based on image aspect ratio */
+  /* Width always stays at 600px */
 }
 
 .dynamic-visual {
@@ -241,25 +275,19 @@ body::after { /* Noise Overlay */
   justify-content: center;
 }
 
-.dynamic-visual:hover {
-  border-color: var(--border-accent);
-  box-shadow: 
-    0 0 50px rgba(0, 191, 255, 0.25),
-    inset 0 0 20px rgba(2, 4, 8, 0.5),
-    0 8px 32px rgba(0, 0, 0, 0.4);
-}
+
 
 .dynamic-visual::before { /* Pattern Layer */
   content: '';
   position: absolute;
   inset: 0;
-  transition: opacity var(--animation-speed-medium) ease, background var(--animation-speed-medium) ease;
+  transition: opacity var(--animation-speed-slow) ease, background var(--animation-speed-medium) ease;
   z-index: 1;
 }
 
 .dynamic-visual-text { /* Text Layer */
   position: relative;
-  transition: all var(--animation-speed-medium) ease;
+  transition: opacity var(--animation-speed-slow) ease, visibility var(--animation-speed-slow) ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -285,20 +313,8 @@ body::after { /* Noise Overlay */
 
 .dynamic-visual::after { display: none; } /* Decommission old text layer */
 
-.dynamic-visual .visual-text-default,
-.dynamic-visual .visual-text-hover {
-  transition: opacity var(--animation-speed-medium) ease;
+.dynamic-visual .visual-text-default {
   width: 100%;
-}
-.dynamic-visual .visual-text-hover {
-  position: absolute;
-  opacity: 0;
-}
-.dynamic-visual:hover .visual-text-default {
-  opacity: 0;
-}
-.dynamic-visual:hover .visual-text-hover {
-  opacity: 1;
 }
 
 .dynamic-visual-title {
@@ -323,54 +339,34 @@ body::after { /* Noise Overlay */
 }
 .dynamic-visual[data-state="default"] .dynamic-visual-title { color: var(--text-technical); }
 
-/* Project-specific visuals */
-.dynamic-visual.attackvector::before {
-  background: 
-    repeating-linear-gradient(0deg, transparent, transparent 5px, rgba(255, 0, 255, 0.15) 5px, rgba(255, 0, 255, 0.15) 10px),
-    repeating-linear-gradient(90deg, transparent, transparent 5px, rgba(255, 0, 255, 0.1) 5px, rgba(255, 0, 255, 0.1) 10px),
-    radial-gradient(circle at 30% 70%, rgba(255, 0, 255, 0.2) 0%, transparent 50%);
-  animation: targetAcquired 2s ease-in-out infinite alternate;
+/* Project-specific visuals - static patterns, no animations */
+.dynamic-visual.attackvector {
+  background: #000000; /* Pure black for video overlay */
 }
-.dynamic-visual.attackvector .dynamic-visual-title {
-  color: var(--accent-secondary); 
-  text-shadow: 0 0 15px var(--accent-secondary);
+.dynamic-visual.attackvector::before {
+  display: none; /* Remove pattern behind video */
+}
+.dynamic-visual.attackvector .dynamic-visual-text {
+  display: none; /* Hide text - video will play here */
 }
 
+.dynamic-visual.reptify {
+  background: #000000; /* Pure black for video overlay */
+}
 .dynamic-visual.reptify::before {
-  background: 
-    repeating-linear-gradient(120deg, transparent, transparent 8px, rgba(57, 255, 20, 0.15) 8px, rgba(57, 255, 20, 0.15) 16px),
-    radial-gradient(ellipse at 60% 40%, rgba(57, 255, 20, 0.2) 0%, transparent 60%);
-  animation: pulseGrid 3s ease-in-out infinite;
+  display: none; /* Remove pattern behind video */
 }
 .dynamic-visual.reptify .dynamic-visual-title { 
   color: var(--accent-success);
   text-shadow: 0 0 15px var(--accent-success);
 }
 
-.dynamic-visual.megaherb::before {
-  background: 
-    repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(148, 0, 211, 0.15) 30deg, transparent 60deg),
-    radial-gradient(circle at 70% 30%, rgba(148, 0, 211, 0.2) 0%, transparent 50%);
-  animation: soundwaveRipple 4s ease-in-out infinite;
-  width: 200%;
-  height: 200%;
-  top: -50%;
-  left: -50%;
-}
-.dynamic-visual.megaherb .dynamic-visual-title {
-  color: var(--accent-tertiary); 
-  text-shadow: 0 0 15px var(--accent-tertiary);
-}
+
 
 .dynamic-visual.aeolis::before {
   background: 
     repeating-linear-gradient(60deg, transparent, transparent 12px, rgba(75, 0, 130, 0.15) 12px, rgba(75, 0, 130, 0.15) 24px),
     repeating-linear-gradient(-60deg, transparent, transparent 12px, rgba(75, 0, 130, 0.1) 12px, rgba(75, 0, 130, 0.1) 24px);
-  animation: dataCoreSpin 6s linear infinite;
-  width: 200%;
-  height: 200%;
-  top: -50%;
-  left: -50%;
 }
 .dynamic-visual.aeolis .dynamic-visual-title { 
   color: var(--accent-quaternary); 
@@ -386,7 +382,6 @@ body::after { /* Noise Overlay */
             var(--bg-secondary) 10px,
             var(--bg-secondary) 20px
         );
-    animation: placeholderPulse 2s ease-in-out infinite;
 }
 .dynamic-visual.placeholder .dynamic-visual-title {
     color: var(--text-secondary);
@@ -397,7 +392,6 @@ body::after { /* Noise Overlay */
     repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 191, 255, 0.2) 3px, rgba(0, 191, 255, 0.2) 6px),
     repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(0, 191, 255, 0.15) 3px, rgba(0, 191, 255, 0.15) 6px),
     linear-gradient(45deg, rgba(0, 191, 255, 0.1) 0%, rgba(255, 0, 255, 0.1) 50%, rgba(0, 191, 255, 0.1) 100%);
-  animation: connectionLines 2s linear infinite;
 }
 .dynamic-visual.contact .dynamic-visual-title {
   color: var(--accent-primary);
@@ -435,7 +429,17 @@ header::after {
     var(--accent-tertiary) 75%, 
     transparent 100%);
   opacity: 0.8;
-  transform: translateX(5px);
+}
+
+header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    transparent 30%, 
+    rgba(0, 191, 255, 0.1) 50%, 
+    transparent 70%);
+  pointer-events: none;
 }
 
 h2 { /* Main page subtitle */
@@ -509,16 +513,50 @@ section#projects {
   gap: 1.5rem;
   position: relative;
   overflow-y: auto; /* Enable scroll on overflow */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
   padding: 1.5rem; /* Uniform padding inside the container */
   border: 2px solid var(--border-primary);
   border-radius: 12px;
   background: var(--glass-primary);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(1px);
   box-shadow: 
     0 4px 20px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(240, 248, 255, 0.1);
   height: 100%; /* Fill parent section */
 }
+
+.project-container::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background-image: url('../images/border-glow-default.png');
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  background-position: left center;
+  border-radius: 12px;
+  z-index: -1;
+  opacity: 0.2;
+  transform: translateX(0%);
+  /* animation: borderGlowTransform 8s ease-in-out infinite; */
+  will-change: transform;
+}
+
+/* Theme-specific gradient images */
+.theme-aether .project-container::before { background-image: url('../images/border-glow-aether.png'); }
+.theme-desert .project-container::before { background-image: url('../images/border-glow-desert.png'); }
+.theme-eclipse .project-container::before { background-image: url('../images/border-glow-eclipse.png'); }
+.theme-future .project-container::before { background-image: url('../images/border-glow-future.png'); }
+.theme-inferno .project-container::before { background-image: url('../images/border-glow-inferno.png'); }
+.theme-lavender .project-container::before { background-image: url('../images/border-glow-lavender.png'); }
+.theme-monolith .project-container::before { background-image: url('../images/border-glow-monolith.png'); }
+.theme-ocean .project-container::before { background-image: url('../images/border-glow-ocean.png'); }
+.theme-pastel .project-container::before { background-image: url('../images/border-glow-pastel.png'); }
+.theme-sakura .project-container::before { background-image: url('../images/border-glow-sakura.png'); }
+.theme-sky .project-container::before { background-image: url('../images/border-glow-sky.png'); }
+.theme-sugar .project-container::before { background-image: url('../images/border-glow-sugar.png'); }
+.theme-sunrise .project-container::before { background-image: url('../images/border-glow-sunrise.png'); }
+.theme-sunset .project-container::before { background-image: url('../images/border-glow-sunset.png'); }
+.theme-tropical .project-container::before { background-image: url('../images/border-glow-tropical.png'); }
 
 .project-container::-webkit-scrollbar {
   width: 12px;
@@ -549,14 +587,14 @@ section#projects {
     border-color: var(--accent-secondary);
     box-shadow: 0 0 20px var(--accent-secondary);
 }
-
+/* mess with the blurs, start dialing into what's causing problems */
 .project {
   position: relative;
   padding: 1.5rem;
   border: 1px solid var(--border-primary);
   border-radius: 12px;
   background: var(--glass-primary);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(1px);
   transition: all var(--animation-speed-medium) ease;
   transform: perspective(1000px) rotateX(1deg);
   box-shadow: 
@@ -564,6 +602,8 @@ section#projects {
     inset 0 1px 0 rgba(240, 248, 255, 0.1),
     inset 0 -1px 0 rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  animation: fadeIn 0.8s ease-in-out forwards;
+  opacity: 0;
 }
 
 .project-link:hover .project {
@@ -575,6 +615,23 @@ section#projects {
     inset 0 1px 0 rgba(240, 248, 255, 0.2),
     0 0 30px rgba(0, 191, 255, 0.15);
   z-index: 10; /* Ensure it renders above other projects */
+}
+
+/* Make visual area black when hovering over project items */
+.content:has(.project-link:hover) .dynamic-visual {
+  background: #000000;
+  transition: background var(--animation-speed-medium) ease;
+}
+
+.content:has(.project-link:hover) .dynamic-visual::before {
+  opacity: 0;
+  transition: opacity var(--animation-speed-slow) ease;
+}
+
+.content:has(.project-link:hover) .dynamic-visual-text {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--animation-speed-slow) ease, visibility var(--animation-speed-slow) ease;
 }
 
 /* Decorative elements */
@@ -596,7 +653,7 @@ section#projects {
 
 .project-link:hover .project::before {
   opacity: 1;
-  animation: dataStreamFlow 1s linear infinite;
+  /* animation: dataStreamFlow 1s linear infinite; */
 }
 
 .project-number {
@@ -632,6 +689,7 @@ section#projects {
 
 .project-link:hover .project .project-title {
   color: var(--accent-primary);
+  transform: translateX(5px);
 }
 
 .project-title a {
@@ -650,6 +708,12 @@ section#projects {
   width: 100%; /* Force full width */
   clear: both; /* Clear any floats */
   margin-top: 0.25rem; /* Add small top margin for separation */
+  transition: all var(--animation-speed-fast) ease;
+}
+
+.project-link:hover .project .project-description {
+  color: var(--text-highlight);
+  transform: translateX(5px);
 }
 
 .project::after {
@@ -675,11 +739,11 @@ section#projects {
   position: relative;
   color: var(--text-primary);
   transition: color var(--animation-speed-fast) ease;
-  --glitch-intensity: 0; /* Re-add for proximity effect */
+  --glitch-intensity: 0; /* No base glitch - only on hover */
 }
 
 .local-glitch-text:hover {
-  color: transparent;
+  color: transparent; /* Hide base text on hover */
 }
 
 .local-glitch-text::before,
@@ -690,7 +754,7 @@ section#projects {
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: var(--glitch-intensity);
+  opacity: 0; /* Hidden by default */
   transition: opacity var(--animation-speed-fast) ease, transform var(--animation-speed-fast) ease;
   overflow: hidden;
   pointer-events: none;
@@ -698,15 +762,15 @@ section#projects {
 
 .local-glitch-text:hover::before,
 .local-glitch-text:hover::after {
-  opacity: 1;
+  opacity: 0.6; /* More subtle than before */
 }
 
 .local-glitch-text:hover::before {
-    transform: translate(-2px, -1px);
+    transform: translate(-1px, -1px); /* More subtle displacement */
 }
 
 .local-glitch-text:hover::after {
-    transform: translate(2px, 1px);
+    transform: translate(1px, 1px); /* More subtle displacement */
 }
 
 .local-glitch-text::before {
@@ -718,7 +782,7 @@ section#projects {
     100% var(--glitch-y2),
     0% var(--glitch-y2)
   );
-  animation: glitch-anim-1 4s infinite linear alternate;
+  /* animation: glitch-anim-1 1.5s infinite linear alternate; */
 }
 
 .local-glitch-text::after {
@@ -730,7 +794,7 @@ section#projects {
     100% var(--glitch-y4),
     0% var(--glitch-y4)
   );
-  animation: glitch-anim-2 3s infinite linear alternate-reverse;
+  /* animation: glitch-anim-2 1.2s infinite linear alternate-reverse; */
 }
 
 /* Glitch activation */
@@ -739,11 +803,79 @@ section#projects {
   opacity: var(--glitch-intensity);
 }
 
-.project-link:hover .local-glitch-text::before,
-.project-link:hover .local-glitch-text::after {
-  opacity: 0.3;
-  animation: glitchAnim1 0.5s steps(3) infinite;
+/* Disable glitch effects only on project descriptions on subpages (not index) */
+body:not(.index-page) .project-description.local-glitch-text {
+  color: var(--text-primary) !important;
+  transition: none;
 }
+
+body:not(.index-page) .project-description.local-glitch-text:hover {
+  color: var(--text-primary) !important;
+}
+
+body:not(.index-page) .project-description.local-glitch-text::before,
+body:not(.index-page) .project-description.local-glitch-text::after {
+  display: none !important;
+}
+
+/* Add proper flex structure to subpage sections */
+body:not(.index-page) section#project-details {
+  flex: 1; /* Take up remaining vertical space */
+  min-height: 0; /* Allow shrinking in flex layout */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Add background to project containers on subpages for better readability */
+body:not(.index-page) .project {
+  background: var(--glass-primary);
+  backdrop-filter: blur(15px);
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-primary);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  margin-bottom: 2rem;
+  flex: 1; /* Take up remaining space */
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-primary) transparent;
+}
+
+/* Custom scrollbar styling for project containers */
+body:not(.index-page) .project::-webkit-scrollbar {
+  width: 6px;
+}
+
+body:not(.index-page) .project::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body:not(.index-page) .project::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 3px;
+}
+
+body:not(.index-page) .project::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+
+body:not(.index-page) .dynamic-visual-text {
+  background: var(--glass-primary);
+  backdrop-filter: blur(15px);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-primary);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Disabled for performance */
+/* .project-link:hover .local-glitch-text::before,
+.project-link:hover .local-glitch-text::after {
+  opacity: 0.7; 
+  animation: glitchAnim1 0.3s steps(5) infinite;
+} */
 
 /* ==========================================================================
    8. FOOTER - FIXED POSITIONING
@@ -763,7 +895,7 @@ footer {
   gap: 2rem;
   font-size: 1rem;
   color: var(--text-secondary);
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
   height: 5rem;
 }
 
@@ -810,10 +942,7 @@ footer::before {
 .footer-link-active {
   color: var(--text-primary);
   cursor: default;
-  background: var(--glass-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: 4px;
-  box-shadow: 0 0 15px rgba(0, 191, 255, 0.2);
+  border-bottom: 1px solid var(--border-primary);
 }
 
 .footer-copyright {
@@ -831,7 +960,147 @@ footer::before {
 }
 
 /* ==========================================================================
-   THEME SELECTOR SQUARES
+   9. CONTACT PAGE SPECIFIC STYLES
+   ========================================================================== */
+
+
+
+.contact-wrapper {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.contact-title-section {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.contact-title-section h1 {
+  font-family: var(--font-main);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+.contact-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.contact-channels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.channel {
+  background: var(--glass-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: 8px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2), inset 0 1px 0 var(--border-secondary);
+  transition: transform var(--animation-speed-medium) ease, box-shadow var(--animation-speed-medium) ease;
+  animation: fadeIn 0.8s ease backwards;
+  animation-delay: var(--channel-delay);
+}
+
+.channel:hover {
+  transform: translateY(-5px) scale(1.02);
+  background: var(--glass-secondary);
+  box-shadow: 0 12px 40px var(--glass-accent), inset 0 1px 0 var(--border-secondary);
+  border-color: var(--border-accent);
+}
+
+.channel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+  transition: left 0.8s ease;
+}
+
+.channel:hover::before {
+  left: 100%;
+  transition: left 0.8s ease;
+}
+
+.channel-title {
+  font-family: var(--font-main);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-technical);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1rem;
+}
+
+.channel-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-primary), transparent);
+  margin: 1rem auto;
+  width: 80%;
+}
+
+.channel-link {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  display: block;
+  padding: 0.5rem 0;
+  transition: color var(--animation-speed-fast) ease;
+}
+
+.channel-link:hover {
+  color: var(--accent-primary);
+  text-shadow: 0 0 10px var(--accent-primary);
+}
+
+.channel-link.inactive {
+  color: var(--text-secondary);
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.channel-link.inactive:hover {
+  color: var(--text-secondary);
+  text-shadow: none;
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.channel-info {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 1rem;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* ==========================================================================
+   10. THEME SELECTOR SQUARES
    ========================================================================== */
 
 .theme-selector-container {
@@ -879,7 +1148,7 @@ footer::before {
 }
 
 /* ==========================================================================
-   9. ANIMATIONS
+   11. ANIMATIONS
    ========================================================================== */
 
 @keyframes titleDrift {
@@ -920,6 +1189,30 @@ footer::before {
   0% { transform: translateX(-100%); }
   50% { transform: translateX(0%); }
   100% { transform: translateX(100%); }
+}
+
+@keyframes exponentialCurve {
+  0% { 
+    transform: translateX(-100%);
+  }
+  20% { 
+    transform: translateX(-95.4%); /* Calculated exponential: barely moved */
+  }
+  40% { 
+    transform: translateX(-85.2%); /* Still very slow */
+  }
+  60% { 
+    transform: translateX(-62.6%); /* Starting to pick up */
+  }
+  80% { 
+    transform: translateX(-12.2%); /* Rapid acceleration */
+  }
+  90% { 
+    transform: translateX(32.8%); /* Very fast */
+  }
+  100% { 
+    transform: translateX(100%); /* Off screen */
+  }
 }
 
 @keyframes fadeOut {
@@ -974,21 +1267,21 @@ footer::before {
 }
 
 @keyframes glitchAnim1 {
-  0% { transform: translate(-2px, -1px); opacity: 0.8; }
-  20% { transform: translate(2px, 1px); opacity: 0.6; }
-  40% { transform: translate(-1px, 2px); opacity: 0.9; }
-  60% { transform: translate(1px, -1px); opacity: 0.7; }
-  80% { transform: translate(-2px, 1px); opacity: 0.8; }
-  100% { transform: translate(2px, -2px); opacity: 0.6; }
+  0% { transform: translate(-4px, -3px); opacity: 0.9; }
+  20% { transform: translate(5px, 2px); opacity: 0.7; }
+  40% { transform: translate(-3px, 4px); opacity: 1; }
+  60% { transform: translate(4px, -2px); opacity: 0.8; }
+  80% { transform: translate(-5px, 3px); opacity: 0.9; }
+  100% { transform: translate(3px, -4px); opacity: 0.7; }
 }
 
 @keyframes glitchAnim2 {
-  0% { transform: translate(2px, 1px); opacity: 0.7; }
-  20% { transform: translate(-1px, -2px); opacity: 0.9; }
-  40% { transform: translate(2px, -1px); opacity: 0.6; }
-  60% { transform: translate(-2px, 2px); opacity: 0.8; }
-  80% { transform: translate(1px, -1px); opacity: 0.7; }
-  100% { transform: translate(-1px, 1px); opacity: 0.9; }
+  0% { transform: translate(4px, 2px); opacity: 0.8; }
+  20% { transform: translate(-3px, -4px); opacity: 1; }
+  40% { transform: translate(5px, -2px); opacity: 0.7; }
+  60% { transform: translate(-4px, 3px); opacity: 0.9; }
+  80% { transform: translate(2px, -3px); opacity: 0.8; }
+  100% { transform: translate(-2px, 4px); opacity: 1; }
 }
 
 @keyframes textFlicker {
@@ -1007,8 +1300,99 @@ footer::before {
   }
 }
 
+@keyframes particleFloat {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translate(30px, -30px) rotate(120deg);
+  }
+  66% {
+    transform: translate(-20px, 20px) rotate(240deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(360deg);
+  }
+}
+
+@keyframes particleGlow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.5); }
+}
+
+@keyframes gridShift {
+  0% { transform: perspective(1000px) rotateX(60deg) scale(2) translateZ(0); }
+  100% { transform: perspective(1000px) rotateX(60deg) scale(2) translateZ(50px); }
+}
+
+@keyframes holoScan {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(10px); }
+}
+
+@keyframes dataDrop {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(100vh) scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes visualPulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 40px rgba(0, 191, 255, 0.15),
+      inset 0 0 20px rgba(2, 4, 8, 0.5),
+      0 8px 32px rgba(0, 0, 0, 0.4);
+  }
+  50% {
+    box-shadow: 
+      0 0 60px rgba(0, 191, 255, 0.25),
+      inset 0 0 30px rgba(2, 4, 8, 0.5),
+      0 12px 40px rgba(0, 0, 0, 0.5);
+  }
+}
+
+@keyframes chromaticShift {
+  0% { text-shadow: 0 0 10px currentColor; }
+  50% { 
+    text-shadow: 
+      -2px 0 rgba(255, 0, 0, 0.7),
+      2px 0 rgba(0, 255, 255, 0.7),
+      0 0 20px currentColor;
+  }
+  100% { text-shadow: 0 0 10px currentColor; }
+}
+
+@keyframes borderGlowTransform {
+  0% { 
+    transform: translateX(0%);
+  }
+  25% { 
+    transform: translateX(-25%);
+  }
+  50% { 
+    transform: translateX(-50%);
+  }
+  75% { 
+    transform: translateX(-25%);
+  }
+  100% { 
+    transform: translateX(0%);
+  }
+}
+
 /* ==========================================================================
-   10. RESPONSIVE DESIGN
+   12. RESPONSIVE DESIGN
    ========================================================================== */
 
 @media (max-width: 1200px) {
@@ -1027,56 +1411,145 @@ footer::before {
   .floating-title {
     font-size: clamp(8rem, 25vw, 20rem);
   }
+
+  .contact-content {
+    padding: 1.5rem;
+  }
 }
 
 @media (max-width: 768px) {
   .content {
-    padding: 1.5rem;
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1.5rem;
   }
 
   .main-area {
     max-width: 100%;
+    width: 100%;
+  }
+
+  .visual-area {
+    height: 250px;
+    min-height: 250px;
+    width: 100%;
+  }
+
+  .dynamic-visual {
+    padding: 1.5rem;
+  }
+
+  .dynamic-visual-title {
+    font-size: 1.2rem;
+  }
+
+  .dynamic-visual-desc {
+    font-size: 0.9rem;
   }
 
   .project-container {
-    gap: 1.5rem;
-  }
-
-  .project {
-    padding: 1.5rem;
-  }
-
-  h2 {
-    font-size: 2rem;
-  }
-
-  .floating-title {
-    font-size: clamp(6rem, 20vw, 15rem);
-  }
-
-  footer {
-    padding: 1.5rem;
-    flex-direction: column;
     gap: 1rem;
-    text-align: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .project {
     padding: 1rem;
+    max-height: 60vh; /* Limit height on mobile */
+  }
+
+  .project {
+    padding: 1.2rem;
+    text-align: left; /* Keep left alignment for readability */
   }
 
   .project-title {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+    margin-bottom: 0.4rem;
   }
 
   .project-description {
     font-size: 0.9rem;
+    line-height: 1.4;
   }
 
   h2 {
     font-size: 1.8rem;
+    text-align: center;
+  }
+
+  .floating-title {
+    font-size: clamp(4rem, 15vw, 12rem);
+    opacity: 0.6; /* Reduce opacity on mobile for better readability */
+  }
+
+  footer {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 0.8rem;
+    text-align: center;
+    font-size: 0.9rem;
+  }
+
+  .contact-channels {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+
+
+  .contact-content {
+    padding: 1rem;
+  }
+
+  .channel {
+    padding: 1.2rem;
+  }
+
+  .channel-title {
+    font-size: 1.2rem;
+  }
+
+  .channel-link {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 0.8rem;
+  }
+
+  .visual-area {
+    height: 200px;
+    min-height: 200px;
+  }
+
+  .dynamic-visual {
+    padding: 1rem;
+  }
+
+  .dynamic-visual-title {
+    font-size: 1rem;
+  }
+
+  .dynamic-visual-desc {
+    font-size: 0.8rem;
+  }
+
+  .project {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .project-title {
+    font-size: 1.3rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .project-description {
+    font-size: 0.85rem;
+    line-height: 1.3;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
   }
 
   h2::before {
@@ -1084,7 +1557,41 @@ footer::before {
   }
 
   .floating-title {
-    font-size: clamp(4rem, 15vw, 10rem);
+    font-size: clamp(3rem, 12vw, 8rem);
+    opacity: 0.5;
+  }
+
+  .project-container {
+    padding: 0.8rem;
+    gap: 0.8rem;
+    max-height: 50vh;
+  }
+
+  .project-number {
+    font-size: 0.8rem;
+    top: 0.8rem;
+    right: 1rem;
+  }
+
+  footer {
+    padding: 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .contact-channels {
+    gap: 1rem;
+  }
+
+  .channel {
+    padding: 1rem;
+  }
+
+  .channel-title {
+    font-size: 1.1rem;
+  }
+
+  .channel-link {
+    font-size: 0.85rem;
   }
 }
 

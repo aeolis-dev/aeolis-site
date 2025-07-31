@@ -11,6 +11,8 @@
   window.addEventListener('load', function() {
     setTimeout(function() {
       docEl.classList.remove('no-transitions');
-    }, 10); // A small delay is usually enough
+      // Ensure transitions are fully enabled for theme changes
+      document.body.style.transition = 'background-color 0.8s ease, color 0.8s ease';
+    }, 50); // Slightly longer delay to ensure full load
   });
 })(); 

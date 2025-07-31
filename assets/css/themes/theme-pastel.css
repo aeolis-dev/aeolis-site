@@ -3,8 +3,8 @@
     --bg-secondary: #fbf0f3;
     --bg-tertiary: #f9eaf0;
 
-    --accent-primary: #ffc0cb;
-    --accent-secondary: #b0e0e6;
+    --accent-primary: #ff6b9d;
+    --accent-secondary: #4ecdc4;
     --accent-tertiary: #d8bfd8;
     --accent-quaternary: #98fb98;
     --accent-success: #b2f7b2;
@@ -15,13 +15,13 @@
     --text-highlight: #a090a2;
     --text-technical: #5c5456;
 
-    --glass-primary: rgba(255, 192, 203, 0.12);
-    --glass-secondary: rgba(176, 224, 230, 0.25);
+    --glass-primary: rgba(255, 255, 255, 0.85);
+    --glass-secondary: rgba(78, 205, 196, 0.25);
     --glass-tertiary: rgba(216, 191, 216, 0.2);
     --glass-accent: rgba(152, 251, 152, 0.2);
     
-    --border-primary: rgba(255, 192, 203, 0.6);
+    --border-primary: rgba(255, 107, 157, 0.6);
     --border-secondary: rgba(92, 84, 86, 0.2);
-    --border-accent: #b0e0e6;
+    --border-accent: #4ecdc4;
     --border-hard: rgba(92, 84, 86, 0.7);
 } 

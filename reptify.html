@@ -6,20 +6,276 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Reptify" />
   <title>Reptify</title>
-  <style>html { background-color: #020408; }</style>
+
+  <!-- Inline critical CSS for instant render -->
+  <style>
+    /* Critical CSS to prevent FOUC */
+    :root {
+      --font-main: 'Rajdhani', 'Orbitron', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --bg-primary: #020408;
+      --bg-secondary: #080D13;
+      --text-primary: #F0F8FF;
+      --text-secondary: #B0C4DE;
+      --accent-primary: #00BFFF;
+      --accent-secondary: #FF00FF;
+      --accent-tertiary: #9400D3;
+      --border-primary: rgba(0, 191, 255, 0.5);
+      --glass-primary: rgba(2, 4, 8, 0.1);
+      --animation-speed-fast: 0.2s;
+    }
+
+    html,
+    body {
+      background-color: var(--bg-primary);
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    body {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: var(--font-mono);
+      color: var(--text-primary);
+      line-height: 1.6;
+      position: relative;
+    }
+
+    body.ready {
+      opacity: 1;
+    }
+
+    .no-transitions,
+    .no-transitions *,
+    .no-transitions *::before,
+    .no-transitions *::after {
+      transition: none !important;
+    }
+
+    .theme-default {
+      --bg-primary: #020408;
+      --bg-secondary: #080D13;
+      --text-primary: #F0F8FF;
+      --text-secondary: #B0C4DE;
+      --accent-primary: #00BFFF;
+      --accent-secondary: #FF00FF;
+      --border-primary: rgba(0, 191, 255, 0.5);
+      --glass-primary: rgba(2, 4, 8, 0.1);
+    }
+
+    /* Critical layout to prevent shifts */
+    .floating-title {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate3d(-50%, -50%, -300px) rotateX(25deg) rotateY(-15deg) skew(-5deg, -2deg);
+      font-family: var(--font-main);
+      font-size: clamp(10rem, 30vw, 35rem);
+      font-weight: 900;
+      color: transparent;
+      background-image: linear-gradient(110deg,
+          rgba(0, 191, 255, 0.2) 10%,
+          rgba(255, 0, 255, 0.15) 40%,
+          rgba(75, 0, 130, 0.2) 70%,
+          rgba(0, 191, 255, 0.08) 90%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      z-index: 5;
+      pointer-events: none;
+      animation: titleDrift 60s steps(120) infinite alternate, titleColorCycle 30s steps(30) infinite;
+      text-shadow:
+        0 0 15px rgba(0, 191, 255, 0.2),
+        0 0 30px rgba(0, 191, 255, 0.1),
+        0 0 60px rgba(75, 0, 130, 0.15);
+      letter-spacing: -0.02em;
+      user-select: none;
+      filter: blur(0.5px) brightness(1.3);
+      opacity: 0.8;
+    }
+
+    @keyframes titleDrift {
+      0% {
+        transform: translate3d(-50%, -50%, -300px) rotateX(25deg) rotateY(-15deg) skew(-5deg, -2deg);
+      }
+
+      100% {
+        transform: translate3d(-50%, -50%, -280px) rotateX(20deg) rotateY(-10deg) skew(-3deg, -1deg);
+      }
+    }
+
+    @keyframes titleColorCycle {
+
+      0%,
+      100% {
+        filter: hue-rotate(0deg) blur(0.5px) brightness(1.3);
+      }
+
+      33% {
+        filter: hue-rotate(120deg) blur(0.8px) brightness(1.1);
+      }
+
+      66% {
+        filter: hue-rotate(240deg) blur(0.3px) brightness(1.5);
+      }
+    }
+
+    .content {
+      flex: 1 0 auto;
+      position: relative;
+      padding: 2rem 3rem;
+      max-width: 1920px;
+      margin: 0 auto;
+      width: 100%;
+      z-index: 10;
+      display: flex;
+      gap: 3rem;
+      align-items: stretch;
+      height: calc(100vh - 5rem);
+    }
+
+    header {
+      height: 5rem;
+      padding: 0 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+
+    h2 {
+      font-family: var(--font-main);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      line-height: 1.2;
+    }
+
+    footer {
+      height: 5rem;
+      flex-shrink: 0;
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      color: var(--text-secondary);
+    }
+
+    .visual-area-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .visual-area {
+      width: 100%;
+      max-width: 600px;
+      min-width: 300px;
+      height: 400px;
+      /* Fixed content size for Reptify */
+      position: relative;
+      flex-shrink: 1;
+      transition: height 0.3s ease, width 0.3s ease, opacity 0.3s ease;
+    }
+
+    .dynamic-visual {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.15s ease;
+    }
+
+    .scanline-overlay,
+    .floating-title,
+    .loading-bar {
+      display: none;
+    }
+
+    body.ready .scanline-overlay,
+    body.ready .floating-title,
+    body.ready .loading-bar {
+      display: block;
+    }
+  </style>
+
   <script src="assets/js/theme-early.js"></script>
-  <link rel="stylesheet" href="assets/css/styles.css">
+
+  <!-- Preload critical resources -->
+  <link rel="preload" href="assets/css/styles.css" as="style">
+  <link rel="preload" href="assets/js/main.js" as="script">
+  <link rel="preload" href="assets/js/theme.js" as="script">
+
+  <!-- Prefetch other pages -->
+  <link rel="prefetch" href="./index.html">
+  <link rel="prefetch" href="./contact.html">
+  <link rel="prefetch" href="./attackvector.html">
+  <link rel="prefetch" href="./megaherb.html">
+
+  <!-- Preload fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Preload critical font files -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" as="style">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" as="style">
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap"
+    as="style">
+
+  <!-- Preload actual font files to prevent resize flash during navigation -->
+  <link rel="preload" href="https://fonts.gstatic.com/s/orbitron/v22/yMJMSUilyP7HbHqlJgkqNl__dNG45J4.woff2" as="font"
+    type="font/woff2" crossorigin>
+  <link rel="preload" href="https://fonts.gstatic.com/s/rajdhani/v13/LDItaoyNOAY6Uewc665JMIzjkxTAAj8.woff2" as="font"
+    type="font/woff2" crossorigin>
+  <link rel="preload"
+    href="https://fonts.gstatic.com/s/jetbrainsmono/v18/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKxjPVmUsaaDhw.woff2"
+    as="font" type="font/woff2" crossorigin>
+
+  <!-- Load font CSS immediately -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap">
+
+  <!-- Load main CSS asynchronously -->
+  <link rel="stylesheet" href="assets/css/styles.css" media="print"
+    onload="this.media='all';document.body.classList.add('ready');">
+  <noscript>
+    <link rel="stylesheet" href="assets/css/styles.css">
+  </noscript>
+
+  <!-- PWA & Performance -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#00BFFF">
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
 </head>
 
 <body>
   <div class="scanline-overlay"></div>
   <div class="floating-title">REPTIFY</div>
-  <div class="glitch-scanlines"></div>
+  <div class="loading-bar"></div>
+
+
   
   <div class="content">
     <div class="main-area">
       <header>
-        <h2><a href="index.html"><span class="local-glitch-text" data-text="&lt;&lt; RETURN TO INDEX">&lt;&lt; RETURN TO INDEX</span></a></h2>
+        <h2><a href="index.html"><span class="local-glitch-text" data-text="&lt;&lt; RETURN TO INDEX">&lt;&lt; RETURN TO
+              INDEX</span></a></h2>
         <div class="theme-toggle">
           <button id="theme-toggle-button">LIGHT &gt;&gt;</button>
         </div>
@@ -27,24 +283,46 @@
 
       <section class="section" id="project-details">
         <div class="project" data-visual="reptify">
-            <div class="project-number">#001</div>
-            <div class="project-title local-glitch-text" data-text="Reptify Details">Reptify Details</div>
-            <div class="project-description local-glitch-text" data-text="This page provides a comprehensive overview of the Reptify mobile application, a tool designed for optimizing muscle hypertrophy. Explore the app's features, design philosophy, and the technology stack used in its development.">
-                This page provides a comprehensive overview of the Reptify mobile application, a tool designed for optimizing muscle hypertrophy. Explore the app's features, design philosophy, and the technology stack used in its development.
-            </div>
+          <div class="project-title local-glitch-text" data-text="Reptify and Biggener">
+            Reptify and Biggener
+          </div>
+          <div class="project-description local-glitch-text">
+            Reptify and Biggener were two mobile apps completed for a mobile software development class. The objective of Reptify was to become familiar with proper structuring of mobile apps according to a UI-Business-Data layer standard. The goal with Biggener was to utilise the Internet of Things (IoT) to create a mobile app that would allow users to interface with physical reality.<br><br>
+
+            Reptify was made for users to track their gym progress, build routines, calculate mathematically ideal weight ranges for their gym sessions, and time weight repetitions for muscle hypertrophy.<br><br>
+
+            Biggener was a movement optimisation app that used the camera and a neural network to track the movement of the barbell and compare it to the theoretical ideal movement path. It could work in real time or analyse a recorded video saved to the device gallery.<br><br>
+
+            Currently, I am working on a modern consolidated version of the apps for public release.
+            <br><br>
+          </div>
+          <div class="project-title local-glitch-text" data-text="Technologies: Reptify">
+            Technologies: Reptify
+          </div>
+          <div class="project-description local-glitch-text">
+            - Built with expo using React Native and JavaScript.<br><br>
+            - Stores and accesses data with Firebase using JSON.<br><br>
+            - Social Media Authentication integration for user specific profiles and data.<br><br>
+            - Animated SVG graphics.<br><br>
+            - Prioritises ease of use - large buttons, text, and graphics, with optional audio cues for use inside a gym with earphones.<br><br>
+          </div>
+          <div class="project-title local-glitch-text" data-text="Technologies: Biggener">
+            Technologies: Biggener
+          </div>
+          <div class="project-description local-glitch-text">
+            - Built with Dart and Flutter.<br><br>
+            - Accesses user gallery with no storage required.<br><br>
+            - Temporary storage with Stateful Widgets.<br><br>
+            - Utilises camera access with a real-time object detection neural network for movement tracking.<br><br>
+            - Records coordinates, and interpolates between points with a bezier curve.
+          </div>
         </div>
       </section>
     </div>
 
-    <div class="visual-area">
-      <div class="dynamic-visual reptify" id="dynamic-visual">
-        <div class="dynamic-visual-text visual-text-default">
-            <div class="dynamic-visual-title">[MOVEMENT OPTIMISATION]</div>
-            <div class="dynamic-visual-desc">A streamlined mobile workout app for optimising muscle hypertrophy.</div>
-        </div>
-        <div class="dynamic-visual-text visual-text-hover">
-            <div class="dynamic-visual-title">[PLACEHOLDER]</div>
-            <div class="dynamic-visual-desc">Many site elements are currently placeholders. Please check back later.</div>
+    <div class="visual-area-container">
+      <div class="visual-area">
+        <div class="dynamic-visual reptify" id="dynamic-visual">
         </div>
       </div>
     </div>
@@ -58,8 +336,18 @@
     </div>
   </footer>
 
+  <script src="assets/js/seamless-nav.js"></script>
+  <script src="assets/js/video-player.js"></script>
   <script src="assets/js/main.js"></script>
   <script src="assets/js/theme.js"></script>
+  <script>
+    // Initialize Reptify video when page loads
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (window.initializeReptifyVideo) {
+        await window.initializeReptifyVideo();
+      }
+    });
+  </script>
 </body>
 
 </html>

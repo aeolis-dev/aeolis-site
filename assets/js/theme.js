@@ -35,6 +35,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const themeSquares = []; // will hold references for later highlighting
 
+    // Utility function to ensure theme transitions work properly
+    const ensureTransitions = () => {
+        // Force remove no-transitions class
+        docEl.classList.remove('no-transitions');
+        
+        // Ensure body has explicit transition properties
+        body.style.transition = 'background-color 0.8s ease, color 0.8s ease';
+        
+        // Force reflow to ensure transitions are applied
+        body.offsetHeight;
+    };
+
     /* --------------------------------------------------
        3. Theme apply / preview helpers
     -------------------------------------------------- */
@@ -60,35 +72,44 @@ document.addEventListener('DOMContentLoaded', () => {
         const theme = themeConfig[themeName];
         if (!theme) return;
 
-        removeThemeClasses();
-        const className = `theme-${theme[mode]}`;
-        body.classList.add(className);
-        docEl.classList.add(className);
+        // Ensure transitions work properly
+        ensureTransitions();
+        
+        // Small delay to ensure transitions are ready
+        setTimeout(() => {
+            removeThemeClasses();
+            const className = `theme-${theme[mode]}`;
+            body.classList.add(className);
+            docEl.classList.add(className);
 
-        // Persist state
-        currentThemeName = themeName;
-        currentMode      = mode;
-        localStorage.setItem('selectedTheme', themeName);
-        localStorage.setItem('themeMode', mode);
-        localStorage.setItem('appliedThemeClass', theme[mode]);
+            // Persist state
+            currentThemeName = themeName;
+            currentMode      = mode;
+            localStorage.setItem('selectedTheme', themeName);
+            localStorage.setItem('themeMode', mode);
+            localStorage.setItem('appliedThemeClass', theme[mode]);
 
-        // Update header toggle text & glitch dataset
-        if (themeToggleButton) {
-            themeToggleButton.textContent = mode === 'dark' ? 'LIGHT >>' : 'DARK >>';
-            themeToggleButton.dataset.text = themeToggleButton.textContent;
-            themeToggleButton.classList.add('local-glitch-text');
-        }
+            // Update header toggle text & glitch dataset
+            if (themeToggleButton) {
+                themeToggleButton.textContent = mode === 'dark' ? 'LIGHT >>' : 'DARK >>';
+                themeToggleButton.dataset.text = themeToggleButton.textContent;
+                themeToggleButton.classList.add('local-glitch-text');
+            }
 
-        updateSquareVisualMode();
-        highlightSelectedSquare(themeName);
-        updateSquareBackgrounds();
+            updateSquareVisualMode();
+            highlightSelectedSquare(themeName);
+            updateSquareBackgrounds();
+        }, 10);
     }
 
     const previewTheme = (themeName) => {
         const theme = themeConfig[themeName];
         if (!theme) return;
+        // Ensure transitions work for preview
+        ensureTransitions();
         removeThemeClasses();
         body.classList.add(`theme-${theme[currentMode]}`);
+        docEl.classList.add(`theme-${theme[currentMode]}`);
     };
 
     /* --------------------------------------------------
@@ -172,7 +193,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Hover preview
         square.addEventListener('mouseenter', () => previewTheme(themeName));
-        square.addEventListener('mouseleave', () => applyTheme(currentThemeName, currentMode));
+        square.addEventListener('mouseleave', () => {
+            ensureTransitions();
+            applyTheme(currentThemeName, currentMode);
+        });
         // Click to set
         square.addEventListener('click', () => applyTheme(themeName, currentMode));
 
@@ -194,6 +218,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const previewMode = currentMode === 'dark' ? 'light' : 'dark';
             const oldMode = currentMode;
             const theme = themeConfig[currentThemeName];
+            // Ensure transitions work for preview
+            ensureTransitions();
             removeThemeClasses();
             const previewClass = `theme-${theme[previewMode]}`;
             body.classList.add(previewClass);
@@ -204,6 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         themeToggleButton.addEventListener('mouseleave', () => {
+            ensureTransitions();
             applyTheme(currentThemeName, currentMode);
             updateSquareBackgrounds();
         });
