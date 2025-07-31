@@ -384,16 +384,6 @@ class VideoPlayer {
       this.imageElement = null;
     }
     
-    // Remove from seamless nav tracking if it exists
-    if (window.seamlessNav && window.seamlessNav.activeVideoPlayers) {
-      for (const [key, player] of window.seamlessNav.activeVideoPlayers.entries()) {
-        if (player === this) {
-          window.seamlessNav.activeVideoPlayers.delete(key);
-          break;
-        }
-      }
-    }
-    
     this.initialized = false;
     this.isPlaying = false;
   }

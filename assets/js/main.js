@@ -4,7 +4,11 @@ let reptifyVideoPlayer = null;
 let megaherbVideoPlayer = null;
 
 // Check if we're on the index page
-const isIndexPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/');
+const isIndexPage = window.location.pathname.endsWith('index.html') || 
+                   window.location.pathname === '/' || 
+                   window.location.pathname.endsWith('/') ||
+                   window.location.pathname.endsWith('index') ||
+                   window.location.pathname === '/index';
 
 // Global function to resize visual area based on content (INDEX PAGE ONLY)
 function resizeVisualArea(contentType = 'default', videoElement = null) {
@@ -807,11 +811,6 @@ window.initializeAttackVectorVideo = async function initializeAttackVectorVideo(
       loop: true
     });
     
-    // Track this video player for cleanup
-    if (window.seamlessNav && window.seamlessNav.activeVideoPlayers) {
-      window.seamlessNav.activeVideoPlayers.set('attackvector', attackVectorVideoPlayer);
-    }
-    
     await attackVectorVideoPlayer.init();
     
     // Auto-play the video
@@ -913,11 +912,6 @@ window.initializeReptifyVideo = async function initializeReptifyVideo() {
       loop: true,
       imageDuration: 1500 // 1.5 seconds per image
     });
-    
-    // Track this video player for cleanup
-    if (window.seamlessNav && window.seamlessNav.activeVideoPlayers) {
-      window.seamlessNav.activeVideoPlayers.set('reptify', reptifyVideoPlayer);
-    }
     
     await reptifyVideoPlayer.init();
     
@@ -1023,11 +1017,6 @@ window.initializeMegaherbVideo = async function initializeMegaherbVideo() {
       loop: true,
       imageDuration: 2000 // 2 seconds per image
     });
-    
-    // Track this video player for cleanup
-    if (window.seamlessNav && window.seamlessNav.activeVideoPlayers) {
-      window.seamlessNav.activeVideoPlayers.set('megaherb', megaherbVideoPlayer);
-    }
     
     await megaherbVideoPlayer.init();
     

@@ -819,11 +819,7 @@ body:not(.index-page) .project-description.local-glitch-text::after {
 }
 
 /* Add proper flex structure to subpage sections */
-body:not(.index-page) section#project-details,
-body.reptify-page section#project-details,
-body.attackvector-page section#project-details,
-body.megaherb-page section#project-details,
-body.contact-page section#project-details {
+body:not(.index-page) section#project-details {
   flex: 1; /* Take up remaining vertical space */
   min-height: 0; /* Allow shrinking in flex layout */
   position: relative;
@@ -832,11 +828,7 @@ body.contact-page section#project-details {
 }
 
 /* Add background to project containers on subpages for better readability */
-body:not(.index-page) .project,
-body.reptify-page .project,
-body.attackvector-page .project,
-body.megaherb-page .project,
-body.contact-page .project {
+body:not(.index-page) .project {
   background: var(--glass-primary);
   backdrop-filter: blur(15px);
   padding: 1.5rem;
@@ -851,44 +843,24 @@ body.contact-page .project {
 }
 
 /* Custom scrollbar styling for project containers */
-body:not(.index-page) .project::-webkit-scrollbar,
-body.reptify-page .project::-webkit-scrollbar,
-body.attackvector-page .project::-webkit-scrollbar,
-body.megaherb-page .project::-webkit-scrollbar,
-body.contact-page .project::-webkit-scrollbar {
+body:not(.index-page) .project::-webkit-scrollbar {
   width: 6px;
 }
 
-body:not(.index-page) .project::-webkit-scrollbar-track,
-body.reptify-page .project::-webkit-scrollbar-track,
-body.attackvector-page .project::-webkit-scrollbar-track,
-body.megaherb-page .project::-webkit-scrollbar-track,
-body.contact-page .project::-webkit-scrollbar-track {
+body:not(.index-page) .project::-webkit-scrollbar-track {
   background: transparent;
 }
 
-body:not(.index-page) .project::-webkit-scrollbar-thumb,
-body.reptify-page .project::-webkit-scrollbar-thumb,
-body.attackvector-page .project::-webkit-scrollbar-thumb,
-body.megaherb-page .project::-webkit-scrollbar-thumb,
-body.contact-page .project::-webkit-scrollbar-thumb {
+body:not(.index-page) .project::-webkit-scrollbar-thumb {
   background: var(--border-primary);
   border-radius: 3px;
 }
 
-body:not(.index-page) .project::-webkit-scrollbar-thumb:hover,
-body.reptify-page .project::-webkit-scrollbar-thumb:hover,
-body.attackvector-page .project::-webkit-scrollbar-thumb:hover,
-body.megaherb-page .project::-webkit-scrollbar-thumb:hover,
-body.contact-page .project::-webkit-scrollbar-thumb:hover {
+body:not(.index-page) .project::-webkit-scrollbar-thumb:hover {
   background: var(--accent-primary);
 }
 
-body:not(.index-page) .dynamic-visual-text,
-body.reptify-page .dynamic-visual-text,
-body.attackvector-page .dynamic-visual-text,
-body.megaherb-page .dynamic-visual-text,
-body.contact-page .dynamic-visual-text {
+body:not(.index-page) .dynamic-visual-text {
   background: var(--glass-primary);
   backdrop-filter: blur(15px);
   padding: 2rem;
