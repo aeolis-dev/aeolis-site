@@ -29,7 +29,9 @@ Thumbs.db
 
 # Development dependencies
 node_modules/
-.cursor/
+
+# Git directory
+.git/
 
 # Python virtual environment
 .venv/
