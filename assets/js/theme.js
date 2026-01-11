@@ -34,6 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentMode      = localStorage.getItem('themeMode')     || 'dark';
 
     const themeSquares = []; // will hold references for later highlighting
+    let previewingTheme = null; // Track which theme is being previewed
+    let pendingApplyTimeout = null; // Track pending apply operations
 
     // Utility function to ensure theme transitions work properly
     const ensureTransitions = () => {
@@ -72,11 +74,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const theme = themeConfig[themeName];
         if (!theme) return;
 
+        // Clear any pending apply operations
+        if (pendingApplyTimeout) {
+            clearTimeout(pendingApplyTimeout);
+            pendingApplyTimeout = null;
+        }
+
+        // Clear preview state when applying a theme
+        previewingTheme = null;
+
         // Ensure transitions work properly
         ensureTransitions();
-        
+
         // Small delay to ensure transitions are ready
-        setTimeout(() => {
+        pendingApplyTimeout = setTimeout(() => {
             removeThemeClasses();
             const className = `theme-${theme[mode]}`;
             body.classList.add(className);
@@ -99,12 +110,23 @@ document.addEventListener('DOMContentLoaded', () => {
             updateSquareVisualMode();
             highlightSelectedSquare(themeName);
             updateSquareBackgrounds();
+            pendingApplyTimeout = null;
         }, 10);
     }
 
     const previewTheme = (themeName) => {
         const theme = themeConfig[themeName];
         if (!theme) return;
+
+        // Clear any pending apply operations
+        if (pendingApplyTimeout) {
+            clearTimeout(pendingApplyTimeout);
+            pendingApplyTimeout = null;
+        }
+
+        // Set the preview state
+        previewingTheme = themeName;
+
         // Ensure transitions work for preview
         ensureTransitions();
         removeThemeClasses();
@@ -194,8 +216,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Hover preview
         square.addEventListener('mouseenter', () => previewTheme(themeName));
         square.addEventListener('mouseleave', () => {
-            ensureTransitions();
-            applyTheme(currentThemeName, currentMode);
+            // Only revert if we're still previewing this specific theme
+            if (previewingTheme === themeName) {
+                ensureTransitions();
+                applyTheme(currentThemeName, currentMode);
+            }
         });
         // Click to set
         square.addEventListener('click', () => applyTheme(themeName, currentMode));
@@ -215,9 +240,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Hover preview with slow transition
         themeToggleButton.addEventListener('mouseenter', () => {
+            // Clear any pending apply operations
+            if (pendingApplyTimeout) {
+                clearTimeout(pendingApplyTimeout);
+                pendingApplyTimeout = null;
+            }
+
             const previewMode = currentMode === 'dark' ? 'light' : 'dark';
             const oldMode = currentMode;
             const theme = themeConfig[currentThemeName];
+
+            // Mark that we're previewing the toggle (use special marker)
+            previewingTheme = '__toggle_preview__';
+
             // Ensure transitions work for preview
             ensureTransitions();
             removeThemeClasses();
@@ -230,9 +265,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         themeToggleButton.addEventListener('mouseleave', () => {
-            ensureTransitions();
-            applyTheme(currentThemeName, currentMode);
-            updateSquareBackgrounds();
+            // Only revert if we're still previewing the toggle
+            if (previewingTheme === '__toggle_preview__') {
+                ensureTransitions();
+                applyTheme(currentThemeName, currentMode);
+                updateSquareBackgrounds();
+            }
         });
     }
 

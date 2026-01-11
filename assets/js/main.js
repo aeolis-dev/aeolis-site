@@ -24,6 +24,169 @@ function destroyAllVideoPlayers() {
   }
 }
 
+// Helper function to create video container
+function createVideoContainer(dynamicVisual) {
+  // Clean up any existing containers
+  const existingContainer = dynamicVisual.querySelector('.video-container');
+  if (existingContainer) {
+    existingContainer.remove();
+  }
+
+  // Create new container
+  const videoContainer = document.createElement('div');
+  videoContainer.className = 'video-container';
+  videoContainer.style.cssText = `
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 5;
+    border-radius: 6px;
+  `;
+  dynamicVisual.insertBefore(videoContainer, dynamicVisual.firstChild);
+
+  return videoContainer;
+}
+
+// Helper function to create media resize handler
+function createMediaResizeHandler(visualArea, maxDimensions = { width: 0.9, height: 500 }) {
+  return (event) => {
+    const { player, isVideo, isImage } = event.detail;
+
+    if (!visualArea) return;
+
+    let mediaWidth, mediaHeight;
+
+    if (isVideo && player.video.videoWidth && player.video.videoHeight) {
+      mediaWidth = player.video.videoWidth;
+      mediaHeight = player.video.videoHeight;
+    } else if (isImage && player.imageElement.naturalWidth && player.imageElement.naturalHeight) {
+      mediaWidth = player.imageElement.naturalWidth;
+      mediaHeight = player.imageElement.naturalHeight;
+    }
+
+    if (mediaWidth && mediaHeight) {
+      // Get container dimensions
+      const containerWidth = visualArea.parentElement.offsetWidth;
+      const containerHeight = visualArea.parentElement.offsetHeight;
+
+      // Media dimensions
+      const mediaAspectRatio = mediaWidth / mediaHeight;
+
+      // Calculate max dimensions
+      const maxWidth = containerWidth * maxDimensions.width;
+      const maxHeight = Math.min(maxDimensions.height, containerHeight * 0.85);
+
+      // Calculate dimensions that fit within the container while maintaining aspect ratio
+      let finalWidth, finalHeight;
+
+      // Try fitting by width first
+      finalWidth = Math.min(containerWidth, maxWidth);
+      finalHeight = finalWidth / mediaAspectRatio;
+
+      // If height exceeds max height, fit by height instead
+      if (finalHeight > maxHeight) {
+        finalHeight = maxHeight;
+        finalWidth = finalHeight * mediaAspectRatio;
+      }
+
+      // Apply the calculated dimensions
+      visualArea.style.width = `${finalWidth}px`;
+      visualArea.style.height = `${finalHeight}px`;
+
+      console.log(`Resized visual area: ${mediaWidth}x${mediaHeight} -> ${finalWidth}x${finalHeight}`);
+    }
+  };
+}
+
+// Helper function to initialize video/image player
+async function initializeMediaPlayer(playerRef, container, mediaItems, options, onResize) {
+  const player = new VideoPlayer(container, mediaItems, options);
+  await player.init();
+  console.log(`Media player initialized for ${mediaItems[0]}`);
+
+  if (player && !player.isDestroyed) {
+    player.play();
+
+    // Add resize event listener if provided
+    if (onResize) {
+      container.addEventListener('mediaResize', onResize);
+    }
+
+    console.log('Media playback started');
+  }
+
+  return player;
+}
+
+// Helper function to initialize page video/image player
+async function initializePageMedia(pageName, mediaItems, options, resizeConfig) {
+  const dynamicVisual = document.getElementById('dynamic-visual');
+  const visualArea = document.querySelector('.visual-area');
+
+  if (!dynamicVisual || !window.VideoPlayer) return;
+
+  try {
+    // Set visual state and sizing class
+    dynamicVisual.className = `dynamic-visual ${pageName}`;
+    visualArea.classList.add(resizeConfig.fitClass);
+
+    // Create video container
+    const videoContainer = createVideoContainer(dynamicVisual);
+
+    // Initialize player
+    const player = new VideoPlayer(videoContainer, mediaItems, options);
+    await player.init();
+    player.play();
+
+    // Handle resize based on configuration
+    if (resizeConfig.useEventResize) {
+      // Event-based resize (for Reptify, MEGAHERB, JOURNALS)
+      const resizeHandler = createMediaResizeHandler(
+        visualArea,
+        { width: resizeConfig.maxWidth, height: resizeConfig.maxHeight }
+      );
+      videoContainer.addEventListener('mediaResize', resizeHandler);
+    } else {
+      // Direct resize (for AttackVector)
+      const videoElement = player.video;
+      const handleVideoResize = () => {
+        if (videoElement.videoWidth && videoElement.videoHeight) {
+          const containerWidth = visualArea.parentElement.offsetWidth;
+          const containerHeight = visualArea.parentElement.offsetHeight;
+          const videoAspectRatio = videoElement.videoWidth / videoElement.videoHeight;
+
+          const maxWidth = containerWidth * resizeConfig.maxWidth;
+          const maxHeight = Math.min(resizeConfig.maxHeight, containerHeight * 0.8);
+
+          let finalWidth = Math.min(containerWidth, maxWidth);
+          let finalHeight = finalWidth / videoAspectRatio;
+
+          if (finalHeight > maxHeight) {
+            finalHeight = maxHeight;
+            finalWidth = finalHeight * videoAspectRatio;
+          }
+
+          visualArea.style.width = `${finalWidth}px`;
+          visualArea.style.height = `${finalHeight}px`;
+
+          videoElement.removeEventListener('loadedmetadata', handleVideoResize);
+        }
+      };
+
+      if (videoElement.videoWidth && videoElement.videoHeight) {
+        handleVideoResize();
+      } else {
+        videoElement.addEventListener('loadedmetadata', handleVideoResize);
+      }
+    }
+
+    console.log(`${pageName} media initialized and playing`);
+    return player;
+  } catch (error) {
+    console.error(`Error initializing ${pageName} media:`, error);
+  }
+}
+
 // Check if we're on the index page
 const isIndexPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/');
 
@@ -172,273 +335,85 @@ document.querySelectorAll('.project').forEach((project, i) => {
           // Special handling for AttackVector - show video
           if (visualType === 'attackvector' && window.VideoPlayer) {
             try {
-              // Destroy all existing players to prevent conflicts
               destroyAllVideoPlayers();
-              
-              // Always create fresh video player for clean state
-              // Clean up any existing video containers
-              const existingContainer = dynamicVisual.querySelector('.video-container');
-              if (existingContainer) {
-                existingContainer.remove();
-              }
-              
-              // Create video container
-              const videoContainer = document.createElement('div');
-              videoContainer.className = 'video-container';
-              videoContainer.style.cssText = `
-                position: absolute;
-                inset: 0;
-                overflow: hidden;
-                z-index: 5;
-                border-radius: 6px;
-              `;
-              dynamicVisual.insertBefore(videoContainer, dynamicVisual.firstChild);
-              
-              // Use MP4 files for better compatibility and performance
-              attackVectorVideoPlayer = new VideoPlayer(videoContainer, [
-                'assets/video/Gameplay.Demonstration.mp4',
-                'assets/video/Gameplay.Demonstration2.mp4',
-                'assets/video/Gameplay.Demonstration3.mp4'
-              ], {
-                fadeDuration: 600,
-                gapDuration: 200,
-                loop: true
-              });
-              
-              await attackVectorVideoPlayer.init();
-              console.log('AttackVector video player initialized for hover');
-              
-              if (attackVectorVideoPlayer && !attackVectorVideoPlayer.isDestroyed) {
-                // Always start fresh - no resume logic
-                attackVectorVideoPlayer.play();
-                
-                // Wait for video to load and then resize the visual area
-                const videoElement = attackVectorVideoPlayer.video;
-                const handleVideoResize = () => {
-                  if (videoElement.videoWidth && videoElement.videoHeight) {
-                    resizeVisualArea('video', videoElement);
-                    videoElement.removeEventListener('loadedmetadata', handleVideoResize);
-                  }
-                };
-                
+              const videoContainer = createVideoContainer(dynamicVisual);
+
+              attackVectorVideoPlayer = await initializeMediaPlayer(
+                'attackVectorVideoPlayer',
+                videoContainer,
+                [
+                  'assets/video/Gameplay.Demonstration.mp4',
+                  'assets/video/Gameplay.Demonstration2.mp4',
+                  'assets/video/Gameplay.Demonstration3.mp4'
+                ],
+                { fadeDuration: 600, gapDuration: 200, loop: true }
+              );
+
+              // AttackVector uses simpler resize approach
+              const videoElement = attackVectorVideoPlayer.video;
+              const handleVideoResize = () => {
                 if (videoElement.videoWidth && videoElement.videoHeight) {
                   resizeVisualArea('video', videoElement);
-                } else {
-                  videoElement.addEventListener('loadedmetadata', handleVideoResize);
+                  videoElement.removeEventListener('loadedmetadata', handleVideoResize);
                 }
-                
-                console.log('AttackVector video started playing on hover');
+              };
+
+              if (videoElement.videoWidth && videoElement.videoHeight) {
+                resizeVisualArea('video', videoElement);
+              } else {
+                videoElement.addEventListener('loadedmetadata', handleVideoResize);
               }
             } catch (error) {
-              console.error('Error initializing video player:', error);
+              console.error('Error initializing AttackVector player:', error);
             }
           }
           
-          // Special handling for Reptify - show video
+          // Special handling for Reptify - show mixed media
           if (visualType === 'reptify' && window.VideoPlayer) {
             try {
-              // Destroy all existing players to prevent conflicts
               destroyAllVideoPlayers();
-              
-              // Always create fresh video player for clean state
-              // Clean up any existing video containers
-              const existingContainer = dynamicVisual.querySelector('.video-container');
-              if (existingContainer) {
-                existingContainer.remove();
-              }
-              
-              // Create video container
-              const videoContainer = document.createElement('div');
-              videoContainer.className = 'video-container';
-              videoContainer.style.cssText = `
-                position: absolute;
-                inset: 0;
-                overflow: hidden;
-                z-index: 5;
-                border-radius: 6px;
-              `;
-              dynamicVisual.insertBefore(videoContainer, dynamicVisual.firstChild);
-              
-              // Use mixed media playlist for Reptify: images first, then video
-              reptifyVideoPlayer = new VideoPlayer(videoContainer, [
-                'assets/images/reptify loading screen.png',
-                'assets/images/reptify sign in.png',
-                'assets/images/reptify home.png',
-                'assets/images/reptify settings.png',
-                'assets/images/reptify calculator.png',
-                'assets/images/reptify timer.png',
-                'assets/video/biggener demo.mp4'
-              ], {
-                fadeDuration: 600,
-                gapDuration: 200,
-                loop: true,
-                imageDuration: 1500 // 1.5 seconds per image
-              });
-              
-              await reptifyVideoPlayer.init();
-              console.log('Reptify video player initialized for hover');
-              
-              if (reptifyVideoPlayer && !reptifyVideoPlayer.isDestroyed) {
-                // Always start fresh - no resume logic
-                reptifyVideoPlayer.play();
-                
-                // Listen for media resize events from the player
-                const handleMediaResize = (event) => {
-                  const { player, isVideo, isImage } = event.detail;
-                  const visualArea = document.querySelector('.visual-area');
-                  
-                  if (!visualArea) return;
-                  
-                  let mediaWidth, mediaHeight;
-                  
-                  if (isVideo && player.video.videoWidth && player.video.videoHeight) {
-                    mediaWidth = player.video.videoWidth;
-                    mediaHeight = player.video.videoHeight;
-                  } else if (isImage && player.imageElement.naturalWidth && player.imageElement.naturalHeight) {
-                    mediaWidth = player.imageElement.naturalWidth;
-                    mediaHeight = player.imageElement.naturalHeight;
-                  }
-                  
-                  if (mediaWidth && mediaHeight) {
-                    // Get container dimensions
-                    const containerWidth = visualArea.parentElement.offsetWidth;
-                    const containerHeight = visualArea.parentElement.offsetHeight;
-                    
-                    // Media dimensions
-                    const mediaAspectRatio = mediaWidth / mediaHeight;
-                    
-                    // For Reptify, allow larger dimensions to accommodate the tall media
-                    const maxWidth = containerWidth * 0.95; // 95% of container width
-                    const maxHeight = Math.min(600, containerHeight * 0.9); // Max 90% of container height or 600px
-                    
-                    // Calculate dimensions that fit within the container while maintaining aspect ratio
-                    let finalWidth, finalHeight;
-                    
-                    // Try fitting by width first
-                    finalWidth = Math.min(containerWidth, maxWidth);
-                    finalHeight = finalWidth / mediaAspectRatio;
-                    
-                    // If height exceeds max height, fit by height instead
-                    if (finalHeight > maxHeight) {
-                      finalHeight = maxHeight;
-                      finalWidth = finalHeight * mediaAspectRatio;
-                    }
-                    
-                    // Apply the calculated dimensions
-                    visualArea.style.width = `${finalWidth}px`;
-                    visualArea.style.height = `${finalHeight}px`;
-                    
-                    console.log(`Resized visual area for ${isVideo ? 'video' : 'image'}: ${mediaWidth}x${mediaHeight} -> ${finalWidth}x${finalHeight}`);
-                  }
-                };
-                
-                // Add event listener for resize events
-                videoContainer.addEventListener('mediaResize', handleMediaResize);
-                
-                console.log('Reptify video started playing on hover');
-              }
+              const videoContainer = createVideoContainer(dynamicVisual);
+              const visualArea = document.querySelector('.visual-area');
+
+              reptifyVideoPlayer = await initializeMediaPlayer(
+                'reptifyVideoPlayer',
+                videoContainer,
+                [
+                  'assets/images/reptify loading screen.png',
+                  'assets/images/reptify sign in.png',
+                  'assets/images/reptify home.png',
+                  'assets/images/reptify settings.png',
+                  'assets/images/reptify calculator.png',
+                  'assets/images/reptify timer.png',
+                  'assets/video/biggener demo.mp4'
+                ],
+                { fadeDuration: 600, gapDuration: 200, loop: true, imageDuration: 1500 },
+                createMediaResizeHandler(visualArea, { width: 0.95, height: 600 }) // Reptify needs larger max height
+              );
             } catch (error) {
-              console.error('Error initializing Reptify video player:', error);
+              console.error('Error initializing Reptify player:', error);
             }
           }
           
           // Special handling for MEGAHERB - show image slideshow
           if (visualType === 'megaherb' && window.VideoPlayer) {
             try {
-              // Destroy all existing players to prevent conflicts
               destroyAllVideoPlayers();
-              
-              // Always create fresh video player for clean state
-              // Clean up any existing video containers
-              const existingContainer = dynamicVisual.querySelector('.video-container');
-              if (existingContainer) {
-                existingContainer.remove();
-              }
-              
-              // Create video container
-              const videoContainer = document.createElement('div');
-              videoContainer.className = 'video-container';
-              videoContainer.style.cssText = `
-                position: absolute;
-                inset: 0;
-                overflow: hidden;
-                z-index: 5;
-                border-radius: 6px;
-              `;
-              dynamicVisual.insertBefore(videoContainer, dynamicVisual.firstChild);
-              
-              // Use image slideshow for MEGAHERB
-              megaherbVideoPlayer = new VideoPlayer(videoContainer, [
-                'assets/images/beta testing with cat.jpg',
-                'assets/images/building microphone.jpg',
-                'assets/images/form acceptance.png',
-                'assets/images/microphone closeup.jpg'
-              ], {
-                fadeDuration: 600,
-                gapDuration: 200,
-                loop: true,
-                imageDuration: 2000 // 2 seconds per image
-              });
-              
-              await megaherbVideoPlayer.init();
-              console.log('MEGAHERB video player initialized for hover');
-              
-              if (megaherbVideoPlayer && !megaherbVideoPlayer.isDestroyed) {
-                // Always start fresh - no resume logic
-                megaherbVideoPlayer.play();
-                
-                // Listen for media resize events from the player
-                const handleMediaResize = (event) => {
-                  const { player, isVideo, isImage } = event.detail;
-                  const visualArea = document.querySelector('.visual-area');
-                  
-                  if (!visualArea) return;
-                  
-                  let mediaWidth, mediaHeight;
-                  
-                  if (isImage && player.imageElement.naturalWidth && player.imageElement.naturalHeight) {
-                    mediaWidth = player.imageElement.naturalWidth;
-                    mediaHeight = player.imageElement.naturalHeight;
-                  }
-                  
-                  if (mediaWidth && mediaHeight) {
-                    // Get container dimensions
-                    const containerWidth = visualArea.parentElement.offsetWidth;
-                    const containerHeight = visualArea.parentElement.offsetHeight;
-                    
-                    // Media dimensions
-                    const mediaAspectRatio = mediaWidth / mediaHeight;
-                    
-                    // For MEGAHERB, use standard dimensions for image slideshow
-                    const maxWidth = containerWidth * 0.9; // 90% of container width
-                    const maxHeight = Math.min(500, containerHeight * 0.85); // Max 85% of container height or 500px
-                    
-                    // Calculate dimensions that fit within the container while maintaining aspect ratio
-                    let finalWidth, finalHeight;
-                    
-                    // Try fitting by width first
-                    finalWidth = Math.min(containerWidth, maxWidth);
-                    finalHeight = finalWidth / mediaAspectRatio;
-                    
-                    // If height exceeds max height, fit by height instead
-                    if (finalHeight > maxHeight) {
-                      finalHeight = maxHeight;
-                      finalWidth = finalHeight * mediaAspectRatio;
-                    }
-                    
-                    // Apply the calculated dimensions
-                    visualArea.style.width = `${finalWidth}px`;
-                    visualArea.style.height = `${finalHeight}px`;
-                    
-                    console.log(`Resized visual area for MEGAHERB image: ${mediaWidth}x${mediaHeight} -> ${finalWidth}x${finalHeight}`);
-                  }
-                };
-                
-                // Add event listener for resize events
-                videoContainer.addEventListener('mediaResize', handleMediaResize);
-                
-                console.log('MEGAHERB slideshow started playing on hover');
-              }
+              const videoContainer = createVideoContainer(dynamicVisual);
+              const visualArea = document.querySelector('.visual-area');
+
+              megaherbVideoPlayer = await initializeMediaPlayer(
+                'megaherbVideoPlayer',
+                videoContainer,
+                [
+                  'assets/images/beta testing with cat.jpg',
+                  'assets/images/building microphone.jpg',
+                  'assets/images/form acceptance.png',
+                  'assets/images/microphone closeup.jpg'
+                ],
+                { fadeDuration: 600, gapDuration: 200, loop: true, imageDuration: 2000 },
+                createMediaResizeHandler(visualArea, { width: 0.9, height: 500 })
+              );
             } catch (error) {
               console.error('Error initializing MEGAHERB video player:', error);
             }
@@ -447,98 +422,20 @@ document.querySelectorAll('.project').forEach((project, i) => {
           // Special handling for JOURNALS - show image slideshow
           if (visualType === 'journals' && window.VideoPlayer) {
             try {
-              // Destroy all existing players to prevent conflicts
               destroyAllVideoPlayers();
+              const videoContainer = createVideoContainer(dynamicVisual);
+              const visualArea = document.querySelector('.visual-area');
 
-              // Always create fresh video player for clean state
-              // Clean up any existing video containers
-              const existingContainer = dynamicVisual.querySelector('.video-container');
-              if (existingContainer) {
-                existingContainer.remove();
-              }
-
-              // Create video container
-              const videoContainer = document.createElement('div');
-              videoContainer.className = 'video-container';
-              videoContainer.style.cssText = `
-                position: absolute;
-                inset: 0;
-                overflow: hidden;
-                z-index: 5;
-                border-radius: 6px;
-              `;
-              dynamicVisual.insertBefore(videoContainer, dynamicVisual.firstChild);
-
-              // Use image slideshow for JOURNALS
-              journalsVideoPlayer = new VideoPlayer(videoContainer, [
-                'assets/images/journals.png',
-                'assets/images/vutu to zebra.png'
-              ], {
-                fadeDuration: 600,
-                gapDuration: 200,
-                loop: true,
-                imageDuration: 2000 // 2 seconds per image
-              });
-
-              await journalsVideoPlayer.init();
-              console.log('JOURNALS video player initialized for hover');
-
-              if (journalsVideoPlayer && !journalsVideoPlayer.isDestroyed) {
-                // Always start fresh - no resume logic
-                journalsVideoPlayer.play();
-
-                // Listen for media resize events from the player
-                const handleMediaResize = (event) => {
-                  const { player, isVideo, isImage } = event.detail;
-                  const visualArea = document.querySelector('.visual-area');
-
-                  if (!visualArea) return;
-
-                  let mediaWidth, mediaHeight;
-
-                  if (isImage && player.imageElement.naturalWidth && player.imageElement.naturalHeight) {
-                    mediaWidth = player.imageElement.naturalWidth;
-                    mediaHeight = player.imageElement.naturalHeight;
-                  }
-
-                  if (mediaWidth && mediaHeight) {
-                    // Get container dimensions
-                    const containerWidth = visualArea.parentElement.offsetWidth;
-                    const containerHeight = visualArea.parentElement.offsetHeight;
-
-                    // Media dimensions
-                    const mediaAspectRatio = mediaWidth / mediaHeight;
-
-                    // For JOURNALS, use standard dimensions for image slideshow
-                    const maxWidth = containerWidth * 0.9; // 90% of container width
-                    const maxHeight = Math.min(500, containerHeight * 0.85); // Max 85% of container height or 500px
-
-                    // Calculate dimensions that fit within the container while maintaining aspect ratio
-                    let finalWidth, finalHeight;
-
-                    // Try fitting by width first
-                    finalWidth = Math.min(containerWidth, maxWidth);
-                    finalHeight = finalWidth / mediaAspectRatio;
-
-                    // If height exceeds max height, fit by height instead
-                    if (finalHeight > maxHeight) {
-                      finalHeight = maxHeight;
-                      finalWidth = finalHeight * mediaAspectRatio;
-                    }
-
-                    // Apply the calculated dimensions
-                    visualArea.style.width = `${finalWidth}px`;
-                    visualArea.style.height = `${finalHeight}px`;
-
-                    console.log(`Resized visual area for JOURNALS image: ${mediaWidth}x${mediaHeight} -> ${finalWidth}x${finalHeight}`);
-                  }
-                };
-
-                // Add event listener for resize events
-                videoContainer.addEventListener('mediaResize', handleMediaResize);
-
-                console.log('JOURNALS slideshow started playing on hover');
-              }
+              journalsVideoPlayer = await initializeMediaPlayer(
+                'journalsVideoPlayer',
+                videoContainer,
+                [
+                  'assets/images/journals.png',
+                  'assets/images/vutu to zebra.png'
+                ],
+                { fadeDuration: 600, gapDuration: 200, loop: true, imageDuration: 2000 },
+                createMediaResizeHandler(visualArea, { width: 0.9, height: 500 })
+              );
             } catch (error) {
               console.error('Error initializing JOURNALS video player:', error);
             }
@@ -547,97 +444,18 @@ document.querySelectorAll('.project').forEach((project, i) => {
           // Special handling for AEOLIS - show single image
           if (visualType === 'aeolis' && window.VideoPlayer) {
             try {
-              // Destroy all existing players to prevent conflicts
               destroyAllVideoPlayers();
-              
-              // Always create fresh video player for clean state
-              // Clean up any existing video containers
-              const existingContainer = dynamicVisual.querySelector('.video-container');
-              if (existingContainer) {
-                existingContainer.remove();
-              }
-              
-              // Create video container
-              const videoContainer = document.createElement('div');
-              videoContainer.className = 'video-container';
-              videoContainer.style.cssText = `
-                position: absolute;
-                inset: 0;
-                overflow: hidden;
-                z-index: 5;
-                border-radius: 6px;
-              `;
-              dynamicVisual.insertBefore(videoContainer, dynamicVisual.firstChild);
-              
-              // Use single image for AEOLIS
-              const aeolisVideoPlayer = new VideoPlayer(videoContainer, [
-                'assets/images/you are here.png'
-              ], {
-                fadeDuration: 600,
-                gapDuration: 200,
-                loop: false, // No loop for single image
-                imageDuration: 0 // No duration limit for single image
-              });
-              
-              await aeolisVideoPlayer.init();
-              console.log('AEOLIS image player initialized for hover');
-              
-              if (aeolisVideoPlayer && !aeolisVideoPlayer.isDestroyed) {
-                // Always start fresh - no resume logic
-                aeolisVideoPlayer.play();
-                
-                // Listen for media resize events from the player
-                const handleMediaResize = (event) => {
-                  const { player, isVideo, isImage } = event.detail;
-                  const visualArea = document.querySelector('.visual-area');
-                  
-                  if (!visualArea) return;
-                  
-                  let mediaWidth, mediaHeight;
-                  
-                  if (isImage && player.imageElement.naturalWidth && player.imageElement.naturalHeight) {
-                    mediaWidth = player.imageElement.naturalWidth;
-                    mediaHeight = player.imageElement.naturalHeight;
-                  }
-                  
-                  if (mediaWidth && mediaHeight) {
-                    // Get container dimensions
-                    const containerWidth = visualArea.parentElement.offsetWidth;
-                    const containerHeight = visualArea.parentElement.offsetHeight;
-                    
-                    // Media dimensions
-                    const mediaAspectRatio = mediaWidth / mediaHeight;
-                    
-                    // For AEOLIS, use standard dimensions for single image
-                    const maxWidth = containerWidth * 0.9; // 90% of container width
-                    const maxHeight = Math.min(500, containerHeight * 0.85); // Max 85% of container height or 500px
-                    
-                    // Calculate dimensions that fit within the container while maintaining aspect ratio
-                    let finalWidth, finalHeight;
-                    
-                    // Try fitting by width first
-                    finalWidth = Math.min(containerWidth, maxWidth);
-                    finalHeight = finalWidth / mediaAspectRatio;
-                    
-                    // If height exceeds max height, fit by height instead
-                    if (finalHeight > maxHeight) {
-                      finalHeight = maxHeight;
-                      finalWidth = finalHeight * mediaAspectRatio;
-                    }
-                    
-                    // Apply the calculated dimensions
-                    visualArea.style.width = `${finalWidth}px`;
-                    visualArea.style.height = `${finalHeight}px`;
-                    
-                    console.log(`Resized visual area for AEOLIS image: ${mediaWidth}x${mediaHeight} -> ${finalWidth}x${finalHeight}`);
-                  }
-                };
-                
-                // Add event listener for resize events
-                videoContainer.addEventListener('mediaResize', handleMediaResize);
-                
-                console.log('AEOLIS image displayed on hover');
-              }
+              const videoContainer = createVideoContainer(dynamicVisual);
+              const visualArea = document.querySelector('.visual-area');
+
+              // AEOLIS uses single image with no loop
+              const aeolisVideoPlayer = await initializeMediaPlayer(
+                'aeolisVideoPlayer',
+                videoContainer,
+                ['assets/images/you are here.png'],
+                { fadeDuration: 600, gapDuration: 200, loop: false, imageDuration: 0 },
+                createMediaResizeHandler(visualArea, { width: 0.9, height: 500 })
+              );
             } catch (error) {
               console.error('Error initializing AEOLIS image player:', error);
             }
@@ -825,134 +643,23 @@ window.initializePageScripts = function() {
 
 // Function to initialize and auto-play video on attackvector page
 window.initializeAttackVectorVideo = async function initializeAttackVectorVideo() {
-  const dynamicVisual = document.getElementById('dynamic-visual');
-  const visualArea = document.querySelector('.visual-area');
-  
-  if (!dynamicVisual || !window.VideoPlayer) return;
-  
-  try {
-    
-    // Set the visual to attackvector state and enable video sizing
-    dynamicVisual.className = 'dynamic-visual attackvector';
-    visualArea.classList.add('video-fit');
-    
-    // Clean up any existing video containers
-    const existingContainer = dynamicVisual.querySelector('.video-container');
-    if (existingContainer) {
-      existingContainer.remove();
-    }
-    
-    // Create video container
-    const videoContainer = document.createElement('div');
-    videoContainer.className = 'video-container';
-    videoContainer.style.cssText = `
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-      z-index: 5;
-      border-radius: 6px;
-    `;
-    dynamicVisual.insertBefore(videoContainer, dynamicVisual.firstChild);
-    
-    // Initialize video player
-    attackVectorVideoPlayer = new VideoPlayer(videoContainer, [
+  attackVectorVideoPlayer = await initializePageMedia(
+    'attackvector',
+    [
       'assets/video/Gameplay.Demonstration.mp4',
       'assets/video/Gameplay.Demonstration2.mp4',
       'assets/video/Gameplay.Demonstration3.mp4'
-    ], {
-      fadeDuration: 600,
-      gapDuration: 200,
-      loop: true
-    });
-    
-    await attackVectorVideoPlayer.init();
-    
-    // Auto-play the video
-    attackVectorVideoPlayer.play();
-    
-    // Resize visual area based on video dimensions using the new sizing logic
-    const videoElement = attackVectorVideoPlayer.video;
-    const handleVideoResize = () => {
-      if (videoElement.videoWidth && videoElement.videoHeight) {
-        // Get container dimensions
-        const containerWidth = visualArea.parentElement.offsetWidth;
-        const containerHeight = visualArea.parentElement.offsetHeight;
-        
-        // Video dimensions
-        const videoWidth = videoElement.videoWidth;
-        const videoHeight = videoElement.videoHeight;
-        const videoAspectRatio = videoWidth / videoHeight;
-        
-        // For AttackVector, use smaller max dimensions
-        const maxWidth = containerWidth * 0.9; // 90% of container width
-        const maxHeight = Math.min(400, containerHeight * 0.8); // Max 80% of container height or 400px
-        
-        // Calculate dimensions that fit within the container while maintaining aspect ratio
-        let finalWidth, finalHeight;
-        
-        // Try fitting by width first
-        finalWidth = Math.min(containerWidth, maxWidth);
-        finalHeight = finalWidth / videoAspectRatio;
-        
-        // If height exceeds max height, fit by height instead
-        if (finalHeight > maxHeight) {
-          finalHeight = maxHeight;
-          finalWidth = finalHeight * videoAspectRatio;
-        }
-        
-        // Apply the calculated dimensions
-        visualArea.style.width = `${finalWidth}px`;
-        visualArea.style.height = `${finalHeight}px`;
-        
-        videoElement.removeEventListener('loadedmetadata', handleVideoResize);
-      }
-    };
-    
-    if (videoElement.videoWidth && videoElement.videoHeight) {
-      handleVideoResize();
-    } else {
-      videoElement.addEventListener('loadedmetadata', handleVideoResize);
-    }
-    
-    console.log('AttackVector video initialized and playing');
-  } catch (error) {
-    console.error('Error initializing AttackVector video:', error);
-  }
+    ],
+    { fadeDuration: 600, gapDuration: 200, loop: true },
+    { fitClass: 'video-fit', useEventResize: false, maxWidth: 0.9, maxHeight: 400 }
+  );
 };
 
 // Function to initialize and auto-play video on reptify page
 window.initializeReptifyVideo = async function initializeReptifyVideo() {
-  const dynamicVisual = document.getElementById('dynamic-visual');
-  const visualArea = document.querySelector('.visual-area');
-  
-  if (!dynamicVisual || !window.VideoPlayer) return;
-  
-  try {
-    
-    // Set the visual to reptify state and enable video sizing
-    dynamicVisual.className = 'dynamic-visual reptify';
-    visualArea.classList.add('video-fit');
-    
-    // Clean up any existing video containers
-    const existingContainer = dynamicVisual.querySelector('.video-container');
-    if (existingContainer) {
-      existingContainer.remove();
-    }
-    
-    // Create video container
-    const videoContainer = document.createElement('div');
-    videoContainer.className = 'video-container';
-    videoContainer.style.cssText = `
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-      z-index: 5;
-      border-radius: 6px;
-    `;
-    dynamicVisual.insertBefore(videoContainer, dynamicVisual.firstChild);
-    
-    // Initialize mixed media player
-    reptifyVideoPlayer = new VideoPlayer(videoContainer, [
+  reptifyVideoPlayer = await initializePageMedia(
+    'reptify',
+    [
       'assets/images/reptify loading screen.png',
       'assets/images/reptify sign in.png',
       'assets/images/reptify home.png',
@@ -960,274 +667,38 @@ window.initializeReptifyVideo = async function initializeReptifyVideo() {
       'assets/images/reptify calculator.png',
       'assets/images/reptify timer.png',
       'assets/video/biggener demo.mp4'
-    ], {
-      fadeDuration: 600,
-      gapDuration: 200,
-      loop: true,
-      imageDuration: 1500 // 1.5 seconds per image
-    });
-    
-    await reptifyVideoPlayer.init();
-    
-    // Auto-play the video
-    reptifyVideoPlayer.play();
-    
-    // Listen for media resize events from the player
-    const handleMediaResize = (event) => {
-      const { player, isVideo, isImage } = event.detail;
-      
-      let mediaWidth, mediaHeight;
-      
-      if (isVideo && player.video.videoWidth && player.video.videoHeight) {
-        mediaWidth = player.video.videoWidth;
-        mediaHeight = player.video.videoHeight;
-      } else if (isImage && player.imageElement.naturalWidth && player.imageElement.naturalHeight) {
-        mediaWidth = player.imageElement.naturalWidth;
-        mediaHeight = player.imageElement.naturalHeight;
-      }
-      
-      if (mediaWidth && mediaHeight) {
-        // Get container dimensions
-        const containerWidth = visualArea.parentElement.offsetWidth;
-        const containerHeight = visualArea.parentElement.offsetHeight;
-        
-        // Media dimensions
-        const mediaAspectRatio = mediaWidth / mediaHeight;
-        
-        // For Reptify, allow larger dimensions to accommodate the tall media
-        const maxWidth = containerWidth * 0.95; // 95% of container width
-        const maxHeight = Math.min(600, containerHeight * 0.9); // Max 90% of container height or 600px
-        
-        // Calculate dimensions that fit within the container while maintaining aspect ratio
-        let finalWidth, finalHeight;
-        
-        // Try fitting by width first
-        finalWidth = Math.min(containerWidth, maxWidth);
-        finalHeight = finalWidth / mediaAspectRatio;
-        
-        // If height exceeds max height, fit by height instead
-        if (finalHeight > maxHeight) {
-          finalHeight = maxHeight;
-          finalWidth = finalHeight * mediaAspectRatio;
-        }
-        
-        // Apply the calculated dimensions
-        visualArea.style.width = `${finalWidth}px`;
-        visualArea.style.height = `${finalHeight}px`;
-        
-        console.log(`Resized visual area for ${isVideo ? 'video' : 'image'}: ${mediaWidth}x${mediaHeight}`);
-      }
-    };
-    
-    // Add event listener for resize events
-    videoContainer.addEventListener('mediaResize', handleMediaResize);
-    
-    console.log('Reptify video initialized and playing');
-  } catch (error) {
-    console.error('Error initializing Reptify video:', error);
-  }
+    ],
+    { fadeDuration: 600, gapDuration: 200, loop: true, imageDuration: 1500 },
+    { fitClass: 'video-fit', useEventResize: true, maxWidth: 0.95, maxHeight: 600 }
+  );
 };
 
 // Function to initialize and auto-play image slideshow on megaherb page
 window.initializeMegaherbVideo = async function initializeMegaherbVideo() {
-  const dynamicVisual = document.getElementById('dynamic-visual');
-  const visualArea = document.querySelector('.visual-area');
-  
-  if (!dynamicVisual || !window.VideoPlayer) return;
-  
-  try {
-    
-    // Set the visual to megaherb state and enable image sizing
-    dynamicVisual.className = 'dynamic-visual megaherb';
-    visualArea.classList.add('image-fit');
-    
-    // Clean up any existing video containers
-    const existingContainer = dynamicVisual.querySelector('.video-container');
-    if (existingContainer) {
-      existingContainer.remove();
-    }
-    
-    // Create video container
-    const videoContainer = document.createElement('div');
-    videoContainer.className = 'video-container';
-    videoContainer.style.cssText = `
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-      z-index: 5;
-      border-radius: 6px;
-    `;
-    dynamicVisual.insertBefore(videoContainer, dynamicVisual.firstChild);
-    
-    // Initialize image slideshow player
-    megaherbVideoPlayer = new VideoPlayer(videoContainer, [
+  megaherbVideoPlayer = await initializePageMedia(
+    'megaherb',
+    [
       'assets/images/beta testing with cat.jpg',
       'assets/images/building microphone.jpg',
       'assets/images/form acceptance.png',
       'assets/images/microphone closeup.jpg'
-    ], {
-      fadeDuration: 600,
-      gapDuration: 200,
-      loop: true,
-      imageDuration: 2000 // 2 seconds per image
-    });
-    
-    await megaherbVideoPlayer.init();
-    
-    // Auto-play the slideshow
-    megaherbVideoPlayer.play();
-    
-    // Listen for media resize events from the player
-    const handleMediaResize = (event) => {
-      const { player, isVideo, isImage } = event.detail;
-      
-      let mediaWidth, mediaHeight;
-      
-      if (isImage && player.imageElement.naturalWidth && player.imageElement.naturalHeight) {
-        mediaWidth = player.imageElement.naturalWidth;
-        mediaHeight = player.imageElement.naturalHeight;
-      }
-      
-      if (mediaWidth && mediaHeight) {
-        // Get container dimensions
-        const containerWidth = visualArea.parentElement.offsetWidth;
-        const containerHeight = visualArea.parentElement.offsetHeight;
-        
-        // Media dimensions
-        const mediaAspectRatio = mediaWidth / mediaHeight;
-        
-        // For MEGAHERB, use standard dimensions for image slideshow
-        const maxWidth = containerWidth * 0.9; // 90% of container width
-        const maxHeight = Math.min(500, containerHeight * 0.85); // Max 85% of container height or 500px
-        
-        // Calculate dimensions that fit within the container while maintaining aspect ratio
-        let finalWidth, finalHeight;
-        
-        // Try fitting by width first
-        finalWidth = Math.min(containerWidth, maxWidth);
-        finalHeight = finalWidth / mediaAspectRatio;
-        
-        // If height exceeds max height, fit by height instead
-        if (finalHeight > maxHeight) {
-          finalHeight = maxHeight;
-          finalWidth = finalHeight * mediaAspectRatio;
-        }
-        
-        // Apply the calculated dimensions
-        visualArea.style.width = `${finalWidth}px`;
-        visualArea.style.height = `${finalHeight}px`;
-        
-        console.log(`Resized visual area for MEGAHERB image: ${mediaWidth}x${mediaHeight} -> ${finalWidth}x${finalHeight}`);
-      }
-    };
-    
-    // Add event listener for resize events
-    videoContainer.addEventListener('mediaResize', handleMediaResize);
-    
-    console.log('MEGAHERB slideshow initialized and playing');
-  } catch (error) {
-    console.error('Error initializing MEGAHERB slideshow:', error);
-  }
+    ],
+    { fadeDuration: 600, gapDuration: 200, loop: true, imageDuration: 2000 },
+    { fitClass: 'image-fit', useEventResize: true, maxWidth: 0.9, maxHeight: 500 }
+  );
 };
 
 // Function to initialize and auto-play image slideshow on journals page
 window.initializeJournalsVideo = async function initializeJournalsVideo() {
-  const dynamicVisual = document.getElementById('dynamic-visual');
-  const visualArea = document.querySelector('.visual-area');
-
-  if (!dynamicVisual || !window.VideoPlayer) return;
-
-  try {
-
-    // Set the visual to journals state and enable image sizing
-    dynamicVisual.className = 'dynamic-visual journals';
-    visualArea.classList.add('image-fit');
-
-    // Clean up any existing video containers
-    const existingContainer = dynamicVisual.querySelector('.video-container');
-    if (existingContainer) {
-      existingContainer.remove();
-    }
-
-    // Create video container
-    const videoContainer = document.createElement('div');
-    videoContainer.className = 'video-container';
-    videoContainer.style.cssText = `
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-      z-index: 5;
-      border-radius: 6px;
-    `;
-    dynamicVisual.insertBefore(videoContainer, dynamicVisual.firstChild);
-
-    // Initialize image slideshow player
-    journalsVideoPlayer = new VideoPlayer(videoContainer, [
+  journalsVideoPlayer = await initializePageMedia(
+    'journals',
+    [
       'assets/images/journals.png',
       'assets/images/vutu to zebra.png'
-    ], {
-      fadeDuration: 600,
-      gapDuration: 200,
-      loop: true,
-      imageDuration: 2000 // 2 seconds per image
-    });
-
-    await journalsVideoPlayer.init();
-
-    // Auto-play the slideshow
-    journalsVideoPlayer.play();
-
-    // Listen for media resize events from the player
-    const handleMediaResize = (event) => {
-      const { player, isVideo, isImage } = event.detail;
-
-      let mediaWidth, mediaHeight;
-
-      if (isImage && player.imageElement.naturalWidth && player.imageElement.naturalHeight) {
-        mediaWidth = player.imageElement.naturalWidth;
-        mediaHeight = player.imageElement.naturalHeight;
-      }
-
-      if (mediaWidth && mediaHeight) {
-        // Get container dimensions
-        const containerWidth = visualArea.parentElement.offsetWidth;
-        const containerHeight = visualArea.parentElement.offsetHeight;
-
-        // Media dimensions
-        const mediaAspectRatio = mediaWidth / mediaHeight;
-
-        // For JOURNALS, use standard dimensions for image slideshow
-        const maxWidth = containerWidth * 0.9; // 90% of container width
-        const maxHeight = Math.min(500, containerHeight * 0.85); // Max 85% of container height or 500px
-
-        // Calculate dimensions that fit within the container while maintaining aspect ratio
-        let finalWidth, finalHeight;
-
-        // Try fitting by width first
-        finalWidth = Math.min(containerWidth, maxWidth);
-        finalHeight = finalWidth / mediaAspectRatio;
-
-        // If height exceeds max height, fit by height instead
-        if (finalHeight > maxHeight) {
-          finalHeight = maxHeight;
-          finalWidth = finalHeight * mediaAspectRatio;
-        }
-
-        // Apply the calculated dimensions
-        visualArea.style.width = `${finalWidth}px`;
-        visualArea.style.height = `${finalHeight}px`;
-
-        console.log(`Resized visual area for JOURNALS image: ${mediaWidth}x${mediaHeight} -> ${finalWidth}x${finalHeight}`);
-      }
-    };
-
-    // Add event listener for resize events
-    videoContainer.addEventListener('mediaResize', handleMediaResize);
-
-    console.log('JOURNALS slideshow initialized and playing');
-  } catch (error) {
-    console.error('Error initializing JOURNALS slideshow:', error);
-  }
+    ],
+    { fadeDuration: 600, gapDuration: 200, loop: true, imageDuration: 2000 },
+    { fitClass: 'image-fit', useEventResize: true, maxWidth: 0.9, maxHeight: 500 }
+  );
 };
 
 // Clean up video players on page unload

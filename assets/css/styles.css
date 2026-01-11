@@ -595,7 +595,6 @@ section#projects {
     border-color: var(--accent-secondary);
     box-shadow: 0 0 20px var(--accent-secondary);
 }
-/* mess with the blurs, start dialing into what's causing problems */
 .project {
   position: relative;
   padding: 1.5rem;
@@ -1603,9 +1602,3 @@ footer::before {
   }
 }
 
-.no-transitions,
-.no-transitions *,
-.no-transitions *::before,
-.no-transitions *::after {
-  transition: none !important;
-} 
