@@ -507,56 +507,64 @@ section#projects {
     position: relative;
 }
 
-.project-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+.project-container-wrapper {
   position: relative;
-  overflow-y: auto; /* Enable scroll on overflow */
-  overflow-x: hidden; /* Prevent horizontal scrolling */
-  padding: 1.5rem; /* Uniform padding inside the container */
+  height: 100%;
   border: 2px solid var(--border-primary);
   border-radius: 12px;
   background: var(--glass-primary);
   backdrop-filter: blur(1px);
-  box-shadow: 
+  box-shadow:
     0 4px 20px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(240, 248, 255, 0.1);
-  height: 100%; /* Fill parent section */
 }
 
-.project-container::before {
+.project-container-wrapper::before {
   content: '';
   position: absolute;
-  inset: -1px;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   background-image: url('../images/border-glow-default.png');
   background-size: 200% 100%;
   background-repeat: no-repeat;
   background-position: left center;
   border-radius: 12px;
-  z-index: -1;
   opacity: 0.2;
-  transform: translateX(0%);
-  /* animation: borderGlowTransform 8s ease-in-out infinite; */
-  will-change: transform;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.project-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 1;
+  overflow-y: auto; /* Enable scroll on overflow */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  padding: 1.5rem; /* Uniform padding inside the container */
+  height: 100%; /* Fill parent wrapper */
+  border-radius: 12px;
 }
 
 /* Theme-specific gradient images */
-.theme-aether .project-container::before { background-image: url('../images/border-glow-aether.png'); }
-.theme-desert .project-container::before { background-image: url('../images/border-glow-desert.png'); }
-.theme-eclipse .project-container::before { background-image: url('../images/border-glow-eclipse.png'); }
-.theme-future .project-container::before { background-image: url('../images/border-glow-future.png'); }
-.theme-inferno .project-container::before { background-image: url('../images/border-glow-inferno.png'); }
-.theme-lavender .project-container::before { background-image: url('../images/border-glow-lavender.png'); }
-.theme-monolith .project-container::before { background-image: url('../images/border-glow-monolith.png'); }
-.theme-ocean .project-container::before { background-image: url('../images/border-glow-ocean.png'); }
-.theme-pastel .project-container::before { background-image: url('../images/border-glow-pastel.png'); }
-.theme-sakura .project-container::before { background-image: url('../images/border-glow-sakura.png'); }
-.theme-sky .project-container::before { background-image: url('../images/border-glow-sky.png'); }
-.theme-sugar .project-container::before { background-image: url('../images/border-glow-sugar.png'); }
-.theme-sunrise .project-container::before { background-image: url('../images/border-glow-sunrise.png'); }
-.theme-sunset .project-container::before { background-image: url('../images/border-glow-sunset.png'); }
-.theme-tropical .project-container::before { background-image: url('../images/border-glow-tropical.png'); }
+.theme-aether .project-container-wrapper::before { background-image: url('../images/border-glow-aether.png'); }
+.theme-desert .project-container-wrapper::before { background-image: url('../images/border-glow-desert.png'); }
+.theme-eclipse .project-container-wrapper::before { background-image: url('../images/border-glow-eclipse.png'); }
+.theme-future .project-container-wrapper::before { background-image: url('../images/border-glow-future.png'); }
+.theme-inferno .project-container-wrapper::before { background-image: url('../images/border-glow-inferno.png'); }
+.theme-lavender .project-container-wrapper::before { background-image: url('../images/border-glow-lavender.png'); }
+.theme-monolith .project-container-wrapper::before { background-image: url('../images/border-glow-monolith.png'); }
+.theme-ocean .project-container-wrapper::before { background-image: url('../images/border-glow-ocean.png'); }
+.theme-pastel .project-container-wrapper::before { background-image: url('../images/border-glow-pastel.png'); }
+.theme-sakura .project-container-wrapper::before { background-image: url('../images/border-glow-sakura.png'); }
+.theme-sky .project-container-wrapper::before { background-image: url('../images/border-glow-sky.png'); }
+.theme-sugar .project-container-wrapper::before { background-image: url('../images/border-glow-sugar.png'); }
+.theme-sunrise .project-container-wrapper::before { background-image: url('../images/border-glow-sunrise.png'); }
+.theme-sunset .project-container-wrapper::before { background-image: url('../images/border-glow-sunset.png'); }
+.theme-tropical .project-container-wrapper::before { background-image: url('../images/border-glow-tropical.png'); }
 
 .project-container::-webkit-scrollbar {
   width: 12px;
@@ -597,7 +605,7 @@ section#projects {
   backdrop-filter: blur(1px);
   transition: all var(--animation-speed-medium) ease;
   transform: perspective(1000px) rotateX(1deg);
-  box-shadow: 
+  box-shadow:
     0 4px 20px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(240, 248, 255, 0.1),
     inset 0 -1px 0 rgba(0, 0, 0, 0.2);

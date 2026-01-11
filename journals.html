@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="WIP: MEGAHERB" />
-  <title>WIP: MEGAHERB</title>
-  
+  <meta name="description" content="Journals Webpage" />
+  <title>Journals Webpage</title>
+
   <!-- Inline critical CSS for instant render -->
   <style>
     /* Critical CSS to prevent FOUC */
@@ -24,7 +24,7 @@
       --glass-primary: rgba(2, 4, 8, 0.1);
       --animation-speed-fast: 0.2s;
     }
-    
+
     html, body {
       background-color: var(--bg-primary);
       margin: 0;
@@ -32,7 +32,7 @@
       overflow: hidden;
       height: 100%;
     }
-    
+
     body {
       opacity: 0;
       transition: opacity 0.3s ease;
@@ -44,18 +44,18 @@
       line-height: 1.6;
       position: relative;
     }
-    
+
     body.ready {
       opacity: 1;
     }
-    
+
     .no-transitions,
     .no-transitions *,
     .no-transitions *::before,
     .no-transitions *::after {
       transition: none !important;
     }
-    
+
     .theme-default {
       --bg-primary: #020408;
       --bg-secondary: #080D13;
@@ -66,7 +66,7 @@
       --border-primary: rgba(0, 191, 255, 0.5);
       --glass-primary: rgba(2, 4, 8, 0.1);
     }
-    
+
     /* Critical layout to prevent shifts */
     .floating-title {
       position: fixed;
@@ -89,7 +89,7 @@
       z-index: 5;
       pointer-events: none;
       animation: titleDrift 60s steps(120) infinite alternate, titleColorCycle 30s steps(30) infinite;
-      text-shadow: 
+      text-shadow:
         0 0 15px rgba(0, 191, 255, 0.2),
         0 0 30px rgba(0, 191, 255, 0.1),
         0 0 60px rgba(75, 0, 130, 0.15);
@@ -109,7 +109,7 @@
       33% { filter: hue-rotate(120deg) blur(0.8px) brightness(1.1); }
       66% { filter: hue-rotate(240deg) blur(0.3px) brightness(1.5); }
     }
-    
+
     .content {
       flex: 1 0 auto;
       position: relative;
@@ -123,7 +123,7 @@
       align-items: stretch;
       height: calc(100vh - 5rem);
     }
-    
+
     header {
       height: 5rem;
       padding: 0 3rem;
@@ -134,7 +134,7 @@
       z-index: 10;
       flex-shrink: 0;
     }
-    
+
     h2 {
       font-family: var(--font-main);
       font-size: 2.2rem;
@@ -145,7 +145,7 @@
       letter-spacing: 0.05em;
       line-height: 1.2;
     }
-    
+
     footer {
       height: 5rem;
       flex-shrink: 0;
@@ -156,7 +156,7 @@
       gap: 2rem;
       color: var(--text-secondary);
     }
-    
+
     .visual-area-container {
       display: flex;
       align-items: center;
@@ -164,17 +164,17 @@
       flex: 1;
       min-width: 0;
     }
-    
+
     .visual-area {
       width: 100%;
       max-width: 600px;
       min-width: 300px;
-      height: 400px; /* Fixed content size for Megaherb */
+      height: 400px;
       position: relative;
       flex-shrink: 1;
       transition: height 0.3s ease, opacity 0.3s ease;
     }
-    
+
     .dynamic-visual {
       width: 100%;
       height: 100%;
@@ -185,7 +185,7 @@
       justify-content: center;
       transition: opacity 0.15s ease;
     }
-    
+
     .scanline-overlay,
     .floating-title,
     .loading-bar {
@@ -197,43 +197,44 @@
       display: block;
     }
   </style>
-  
+
   <script src="assets/js/theme-early.js"></script>
-  
+
   <!-- Preload critical resources -->
   <link rel="preload" href="assets/css/styles.css" as="style">
   <link rel="preload" href="assets/js/main.js" as="script">
   <link rel="preload" href="assets/js/theme.js" as="script">
-  
+
   <!-- Prefetch other pages -->
   <link rel="prefetch" href="./index.html">
   <link rel="prefetch" href="./contact.html">
   <link rel="prefetch" href="./attackvector.html">
   <link rel="prefetch" href="./reptify.html">
-  
+  <link rel="prefetch" href="./megaherb.html">
+
   <!-- Preload fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  
+
   <!-- Preload critical font files -->
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" as="style">
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap" as="style">
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap" as="style">
-  
+
   <!-- Preload actual font files to prevent resize flash during navigation -->
   <link rel="preload" href="https://fonts.gstatic.com/s/orbitron/v22/yMJMSUilyP7HbHqlJgkqNl__dNG45J4.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="https://fonts.gstatic.com/s/rajdhani/v13/LDItaoyNOAY6Uewc665JMIzjkxTAAj8.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="https://fonts.gstatic.com/s/jetbrainsmono/v18/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKxjPVmUsaaDhw.woff2" as="font" type="font/woff2" crossorigin>
-  
+
   <!-- Load font CSS immediately -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&display=swap">
-  
+
   <!-- Load main CSS asynchronously -->
   <link rel="stylesheet" href="assets/css/styles.css" media="print" onload="this.media='all';document.body.classList.add('ready');">
   <noscript><link rel="stylesheet" href="assets/css/styles.css"></noscript>
-  
+
   <!-- PWA & Performance -->
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#00BFFF">
@@ -242,9 +243,9 @@
 
 <body>
   <div class="scanline-overlay"></div>
-  <div class="floating-title">MEGAHERB</div>
+  <div class="floating-title">JOURNALS</div>
   <div class="loading-bar"></div>
-  
+
   <div class="content">
     <div class="main-area">
       <header>
@@ -255,33 +256,31 @@
       </header>
 
       <section class="section" id="project-details">
-        <div class="project" data-visual="megaherb">
-          <div class="project-title local-glitch-text" data-text="What is MEGAHERB?">
-            What is MEGAHERB?
-          </div>
-          <div class="project-description local-glitch-text"]>
-            MEGAHERB is a personal music project pushing the sonic boundaries of sound design, rhythm, texture, and tonality.<br><br>
-            MEGAHERB encompasses all my audio-based creative output, including music production and development, as well as visual aesthetic. It is a perpetual WIP in constant evolution.<br><br>
-          </div>
-          <div class="project-title local-glitch-text" data-text="Projects and Achievements">
-            Projects and Achievements
+        <div class="project" data-visual="journals">
+          <div class="project-title local-glitch-text" data-text="Journals dot Network">
+            Journals dot Network
           </div>
           <div class="project-description local-glitch-text">
-            - Construction of ultrasonic microphones for recording audio outside of the human hearing range for sound design purposes. This involves soldering microphone capsules with an optional PCB for use with a field recording device. These samples can be slowed down to reshape the perceived size of recorded objects and atmospheres while retaining a full audio spectrum.<br><br>
-            - Creation of a track within an 18 hour time limit for the Form Any% Level 2 compilation. My track "Cataclysm" was voted to be selected for the compilation among 325 total entries. Cataclysm explores modern bass music sound design and spatial warping effects. <a href="https://soundcloud.com/artbyform/megaherb-cataclysm" target="_blank">[LINK]</a><br><br>
-            - Demonstration track for a purchasable sample pack. <a href="https://bsky.app/profile/did:plc:jzuwdca4qg4yq3eh4352ic5m/post/3lhvzvpj4ek2d" target="_blank">[LINK]</a><br><br>
-            - Ambient track "Solstice" explores various sound design techniques manipulating vocals and recorded textures, submitted for a compilation with the requirement of using plugins from the hosting developer. <a href="https://unplugcord.bandcamp.com/track/solstice" target="_blank">[LINK]</a><br><br>
-            - Started work on plugin development, currently with the Apple Audio Unit framework in C++. Exploring proper C++ practices and design patterns, and studying efficient utilisation of modern processors.
-            - Winner of Kilohearts' Game Audio Week Sound Design Contest 2025. <a href="https://kilohearts.com/blog/game_audio_week_2025_contest_winners" target="_blank">[LINK]</a><br><br>
-            - Beta tested audio plugins and software for the following companies and developers: Ableton, apulSoft, Ewan Bristow, blepfx, Anukari, Sonic Academy, LHI Audio, Polyverse Music, u-He. Personal vouches from various developers can be provided upon request!
+            This is website I recently developed for my friends and I to host content on and links to our social media and music streams.<br><br>
+          </div>
+
+          <div class="project-title local-glitch-text" data-text="Vutu to Zebra 3 Modal Profile Converter">
+            Vutu to Zebra 3 Modal Profile Converter
+          </div>
+          <div class="project-description local-glitch-text">
+            Zebra 3 is a new software synthesizer currently in open beta. It has a "modal" module which allows the user to synthesize the timbres of real resonant objects using modal synthesis. There is a lack of factory profiles for this, so I made a web app to convert .utu files to Zebra 3 .csv profiles. .utu files are created by Vutu, a free program for analysing the spectral profiles of audio sources.<br><br>
           </div>
         </div>
       </section>
     </div>
 
     <div class="visual-area-container">
-    <div class="visual-area">
-      <div class="dynamic-visual megaherb" id="dynamic-visual">
+      <div class="visual-area">
+        <div class="dynamic-visual journals" id="dynamic-visual">
+          <div class="dynamic-visual-text visual-text-default">
+            <div class="dynamic-visual-title">[VISUAL ZONE]</div>
+            <div class="dynamic-visual-desc">Visual content will display here.</div>
+          </div>
         </div>
       </div>
     </div>

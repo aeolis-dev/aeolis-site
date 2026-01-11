@@ -2,6 +2,27 @@
 let attackVectorVideoPlayer = null;
 let reptifyVideoPlayer = null;
 let megaherbVideoPlayer = null;
+let journalsVideoPlayer = null;
+
+// Helper function to destroy all video players
+function destroyAllVideoPlayers() {
+  if (attackVectorVideoPlayer && !attackVectorVideoPlayer.isDestroyed) {
+    attackVectorVideoPlayer.destroy();
+    attackVectorVideoPlayer = null;
+  }
+  if (reptifyVideoPlayer && !reptifyVideoPlayer.isDestroyed) {
+    reptifyVideoPlayer.destroy();
+    reptifyVideoPlayer = null;
+  }
+  if (megaherbVideoPlayer && !megaherbVideoPlayer.isDestroyed) {
+    megaherbVideoPlayer.destroy();
+    megaherbVideoPlayer = null;
+  }
+  if (journalsVideoPlayer && !journalsVideoPlayer.isDestroyed) {
+    journalsVideoPlayer.destroy();
+    journalsVideoPlayer = null;
+  }
+}
 
 // Check if we're on the index page
 const isIndexPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/');
@@ -151,18 +172,8 @@ document.querySelectorAll('.project').forEach((project, i) => {
           // Special handling for AttackVector - show video
           if (visualType === 'attackvector' && window.VideoPlayer) {
             try {
-              
-              // Destroy existing player if it exists but isn't ready
-              if (attackVectorVideoPlayer && !videoPlayerReady) {
-                attackVectorVideoPlayer.destroy();
-                attackVectorVideoPlayer = null;
-              }
-              
-              // Also destroy Reptify player if it exists to prevent conflicts
-              if (reptifyVideoPlayer) {
-                reptifyVideoPlayer.destroy();
-                reptifyVideoPlayer = null;
-              }
+              // Destroy all existing players to prevent conflicts
+              destroyAllVideoPlayers();
               
               // Always create fresh video player for clean state
               // Clean up any existing video containers
@@ -226,23 +237,8 @@ document.querySelectorAll('.project').forEach((project, i) => {
           // Special handling for Reptify - show video
           if (visualType === 'reptify' && window.VideoPlayer) {
             try {
-              
-              // Destroy existing player if it exists but isn't ready
-              if (reptifyVideoPlayer && !videoPlayerReady) {
-                reptifyVideoPlayer.destroy();
-                reptifyVideoPlayer = null;
-              }
-              
-              // Also destroy other players if they exist to prevent conflicts
-              if (attackVectorVideoPlayer) {
-                attackVectorVideoPlayer.destroy();
-                attackVectorVideoPlayer = null;
-              }
-              
-              if (megaherbVideoPlayer) {
-                megaherbVideoPlayer.destroy();
-                megaherbVideoPlayer = null;
-              }
+              // Destroy all existing players to prevent conflicts
+              destroyAllVideoPlayers();
               
               // Always create fresh video player for clean state
               // Clean up any existing video containers
@@ -349,22 +345,8 @@ document.querySelectorAll('.project').forEach((project, i) => {
           // Special handling for MEGAHERB - show image slideshow
           if (visualType === 'megaherb' && window.VideoPlayer) {
             try {
-              
-              // Destroy existing players if they exist to prevent conflicts
-              if (attackVectorVideoPlayer) {
-                attackVectorVideoPlayer.destroy();
-                attackVectorVideoPlayer = null;
-              }
-              
-              if (reptifyVideoPlayer) {
-                reptifyVideoPlayer.destroy();
-                reptifyVideoPlayer = null;
-              }
-              
-              if (megaherbVideoPlayer) {
-                megaherbVideoPlayer.destroy();
-                megaherbVideoPlayer = null;
-              }
+              // Destroy all existing players to prevent conflicts
+              destroyAllVideoPlayers();
               
               // Always create fresh video player for clean state
               // Clean up any existing video containers
@@ -462,25 +444,111 @@ document.querySelectorAll('.project').forEach((project, i) => {
             }
           }
           
+          // Special handling for JOURNALS - show image slideshow
+          if (visualType === 'journals' && window.VideoPlayer) {
+            try {
+              // Destroy all existing players to prevent conflicts
+              destroyAllVideoPlayers();
+
+              // Always create fresh video player for clean state
+              // Clean up any existing video containers
+              const existingContainer = dynamicVisual.querySelector('.video-container');
+              if (existingContainer) {
+                existingContainer.remove();
+              }
+
+              // Create video container
+              const videoContainer = document.createElement('div');
+              videoContainer.className = 'video-container';
+              videoContainer.style.cssText = `
+                position: absolute;
+                inset: 0;
+                overflow: hidden;
+                z-index: 5;
+                border-radius: 6px;
+              `;
+              dynamicVisual.insertBefore(videoContainer, dynamicVisual.firstChild);
+
+              // Use image slideshow for JOURNALS
+              journalsVideoPlayer = new VideoPlayer(videoContainer, [
+                'assets/images/journals.png',
+                'assets/images/vutu to zebra.png'
+              ], {
+                fadeDuration: 600,
+                gapDuration: 200,
+                loop: true,
+                imageDuration: 2000 // 2 seconds per image
+              });
+
+              await journalsVideoPlayer.init();
+              console.log('JOURNALS video player initialized for hover');
+
+              if (journalsVideoPlayer && !journalsVideoPlayer.isDestroyed) {
+                // Always start fresh - no resume logic
+                journalsVideoPlayer.play();
+
+                // Listen for media resize events from the player
+                const handleMediaResize = (event) => {
+                  const { player, isVideo, isImage } = event.detail;
+                  const visualArea = document.querySelector('.visual-area');
+
+                  if (!visualArea) return;
+
+                  let mediaWidth, mediaHeight;
+
+                  if (isImage && player.imageElement.naturalWidth && player.imageElement.naturalHeight) {
+                    mediaWidth = player.imageElement.naturalWidth;
+                    mediaHeight = player.imageElement.naturalHeight;
+                  }
+
+                  if (mediaWidth && mediaHeight) {
+                    // Get container dimensions
+                    const containerWidth = visualArea.parentElement.offsetWidth;
+                    const containerHeight = visualArea.parentElement.offsetHeight;
+
+                    // Media dimensions
+                    const mediaAspectRatio = mediaWidth / mediaHeight;
+
+                    // For JOURNALS, use standard dimensions for image slideshow
+                    const maxWidth = containerWidth * 0.9; // 90% of container width
+                    const maxHeight = Math.min(500, containerHeight * 0.85); // Max 85% of container height or 500px
+
+                    // Calculate dimensions that fit within the container while maintaining aspect ratio
+                    let finalWidth, finalHeight;
+
+                    // Try fitting by width first
+                    finalWidth = Math.min(containerWidth, maxWidth);
+                    finalHeight = finalWidth / mediaAspectRatio;
+
+                    // If height exceeds max height, fit by height instead
+                    if (finalHeight > maxHeight) {
+                      finalHeight = maxHeight;
+                      finalWidth = finalHeight * mediaAspectRatio;
+                    }
+
+                    // Apply the calculated dimensions
+                    visualArea.style.width = `${finalWidth}px`;
+                    visualArea.style.height = `${finalHeight}px`;
+
+                    console.log(`Resized visual area for JOURNALS image: ${mediaWidth}x${mediaHeight} -> ${finalWidth}x${finalHeight}`);
+                  }
+                };
+
+                // Add event listener for resize events
+                videoContainer.addEventListener('mediaResize', handleMediaResize);
+
+                console.log('JOURNALS slideshow started playing on hover');
+              }
+            } catch (error) {
+              console.error('Error initializing JOURNALS video player:', error);
+            }
+          }
+
           // Special handling for AEOLIS - show single image
           if (visualType === 'aeolis' && window.VideoPlayer) {
             try {
-              
-              // Destroy existing players if they exist to prevent conflicts
-              if (attackVectorVideoPlayer) {
-                attackVectorVideoPlayer.destroy();
-                attackVectorVideoPlayer = null;
-              }
-              
-              if (reptifyVideoPlayer) {
-                reptifyVideoPlayer.destroy();
-                reptifyVideoPlayer = null;
-              }
-              
-              if (megaherbVideoPlayer) {
-                megaherbVideoPlayer.destroy();
-                megaherbVideoPlayer = null;
-              }
+              // Destroy all existing players to prevent conflicts
+              destroyAllVideoPlayers();
               
               // Always create fresh video player for clean state
               // Clean up any existing video containers
@@ -581,32 +649,17 @@ document.querySelectorAll('.project').forEach((project, i) => {
         // Reset to default state
         dynamicVisual.className = 'dynamic-visual';
         resizeVisualArea('default');
-        
-        // Stop and destroy video players
-        if (attackVectorVideoPlayer && !attackVectorVideoPlayer.isDestroyed) {
-          attackVectorVideoPlayer.destroy();
-          attackVectorVideoPlayer = null;
-          console.log('AttackVector video destroyed on mouse leave');
+
+        // Destroy all video players
+        destroyAllVideoPlayers();
+
+        // Clean up any video player containers (for locally created players like aeolis)
+        const videoContainer = dynamicVisual.querySelector('.video-container');
+        if (videoContainer) {
+          videoContainer.remove();
         }
-        
-        if (reptifyVideoPlayer && !reptifyVideoPlayer.isDestroyed) {
-          reptifyVideoPlayer.destroy();
-          reptifyVideoPlayer = null;
-          console.log('Reptify video destroyed on mouse leave');
-        }
-        
-        if (megaherbVideoPlayer && !megaherbVideoPlayer.isDestroyed) {
-          megaherbVideoPlayer.destroy();
-          megaherbVideoPlayer = null;
-          console.log('MEGAHERB video destroyed on mouse leave');
-        }
-        
-        // Clean up any aeolis video player (it's created locally in the hover handler)
-        const aeolisContainer = dynamicVisual.querySelector('.video-container');
-        if (aeolisContainer) {
-          aeolisContainer.remove();
-          console.log('AEOLIS image container removed on mouse leave');
-        }
+
+        console.log('All video players destroyed on mouse leave');
       });
     }
   }
@@ -630,6 +683,11 @@ window.addEventListener('load', () => {
   // Initialize video player for MEGAHERB page if we're on that page
   if (!isIndexPage && window.location.pathname.includes('megaherb')) {
     initializeMegaherbVideo();
+  }
+
+  // Initialize video player for JOURNALS page if we're on that page
+  if (!isIndexPage && window.location.pathname.includes('journals')) {
+    initializeJournalsVideo();
   }
 });
 
@@ -1072,15 +1130,107 @@ window.initializeMegaherbVideo = async function initializeMegaherbVideo() {
   }
 };
 
-// Clean up video player on page unload
+// Function to initialize and auto-play image slideshow on journals page
+window.initializeJournalsVideo = async function initializeJournalsVideo() {
+  const dynamicVisual = document.getElementById('dynamic-visual');
+  const visualArea = document.querySelector('.visual-area');
+
+  if (!dynamicVisual || !window.VideoPlayer) return;
+
+  try {
+
+    // Set the visual to journals state and enable image sizing
+    dynamicVisual.className = 'dynamic-visual journals';
+    visualArea.classList.add('image-fit');
+
+    // Clean up any existing video containers
+    const existingContainer = dynamicVisual.querySelector('.video-container');
+    if (existingContainer) {
+      existingContainer.remove();
+    }
+
+    // Create video container
+    const videoContainer = document.createElement('div');
+    videoContainer.className = 'video-container';
+    videoContainer.style.cssText = `
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: 5;
+      border-radius: 6px;
+    `;
+    dynamicVisual.insertBefore(videoContainer, dynamicVisual.firstChild);
+
+    // Initialize image slideshow player
+    journalsVideoPlayer = new VideoPlayer(videoContainer, [
+      'assets/images/journals.png',
+      'assets/images/vutu to zebra.png'
+    ], {
+      fadeDuration: 600,
+      gapDuration: 200,
+      loop: true,
+      imageDuration: 2000 // 2 seconds per image
+    });
+
+    await journalsVideoPlayer.init();
+
+    // Auto-play the slideshow
+    journalsVideoPlayer.play();
+
+    // Listen for media resize events from the player
+    const handleMediaResize = (event) => {
+      const { player, isVideo, isImage } = event.detail;
+
+      let mediaWidth, mediaHeight;
+
+      if (isImage && player.imageElement.naturalWidth && player.imageElement.naturalHeight) {
+        mediaWidth = player.imageElement.naturalWidth;
+        mediaHeight = player.imageElement.naturalHeight;
+      }
+
+      if (mediaWidth && mediaHeight) {
+        // Get container dimensions
+        const containerWidth = visualArea.parentElement.offsetWidth;
+        const containerHeight = visualArea.parentElement.offsetHeight;
+
+        // Media dimensions
+        const mediaAspectRatio = mediaWidth / mediaHeight;
+
+        // For JOURNALS, use standard dimensions for image slideshow
+        const maxWidth = containerWidth * 0.9; // 90% of container width
+        const maxHeight = Math.min(500, containerHeight * 0.85); // Max 85% of container height or 500px
+
+        // Calculate dimensions that fit within the container while maintaining aspect ratio
+        let finalWidth, finalHeight;
+
+        // Try fitting by width first
+        finalWidth = Math.min(containerWidth, maxWidth);
+        finalHeight = finalWidth / mediaAspectRatio;
+
+        // If height exceeds max height, fit by height instead
+        if (finalHeight > maxHeight) {
+          finalHeight = maxHeight;
+          finalWidth = finalHeight * mediaAspectRatio;
+        }
+
+        // Apply the calculated dimensions
+        visualArea.style.width = `${finalWidth}px`;
+        visualArea.style.height = `${finalHeight}px`;
+
+        console.log(`Resized visual area for JOURNALS image: ${mediaWidth}x${mediaHeight} -> ${finalWidth}x${finalHeight}`);
+      }
+    };
+
+    // Add event listener for resize events
+    videoContainer.addEventListener('mediaResize', handleMediaResize);
+
+    console.log('JOURNALS slideshow initialized and playing');
+  } catch (error) {
+    console.error('Error initializing JOURNALS slideshow:', error);
+  }
+};
+
+// Clean up video players on page unload
 window.addEventListener('beforeunload', () => {
-  if (attackVectorVideoPlayer) {
-    attackVectorVideoPlayer.destroy();
-  }
-  if (reptifyVideoPlayer) {
-    reptifyVideoPlayer.destroy();
-  }
-  if (megaherbVideoPlayer) {
-    megaherbVideoPlayer.destroy();
-  }
+  destroyAllVideoPlayers();
 }); 
