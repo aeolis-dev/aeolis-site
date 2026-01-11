@@ -268,7 +268,13 @@
             Vutu to Zebra 3 Modal Profile Converter
           </div>
           <div class="project-description local-glitch-text">
+            This is a tool hosted on the site which takes files, processes them locally, then downloads the processed files to your computer. Multiple files will also be zipped. <br><br>
+          </div>
+          <div class="project-description local-glitch-text">
             Zebra 3 is a new software synthesizer currently in open beta. It has a "modal" module which allows the user to synthesize the timbres of real resonant objects using modal synthesis. There is a lack of factory profiles for this, so I made a web app to convert .utu files to Zebra 3 .csv profiles. .utu files are created by Vutu, a free program for analysing the spectral profiles of audio sources.<br><br>
+          </div>
+          <div class="project-description local-glitch-text">
+            The app uses JavaScript on the backend to convert arrays of harmonic data into individual modal partials. The source files are in JSON format, and the algorithm searches for the loudest point in the array to determine amplitude and frequency. Quiet partials and short partials will be filtered out, as will those which have a lot of frequency variation. I experimented with different algorithms of varying complexity, but by the end, a naive approach worked best. This also allows very fast processing, essentially instant even for large batches of files. <br><br>
           </div>
         </div>
       </section>
