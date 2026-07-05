@@ -1,7 +1,7 @@
 // Initialize project card hover effects and dynamic visual area
 let attackVectorVideoPlayer = null;
 let reptifyVideoPlayer = null;
-let megaherbVideoPlayer = null;
+let audiovisualVideoPlayer = null;
 let journalsVideoPlayer = null;
 
 // Helper function to destroy all video players
@@ -14,9 +14,9 @@ function destroyAllVideoPlayers() {
     reptifyVideoPlayer.destroy();
     reptifyVideoPlayer = null;
   }
-  if (megaherbVideoPlayer && !megaherbVideoPlayer.isDestroyed) {
-    megaherbVideoPlayer.destroy();
-    megaherbVideoPlayer = null;
+  if (audiovisualVideoPlayer && !audiovisualVideoPlayer.isDestroyed) {
+    audiovisualVideoPlayer.destroy();
+    audiovisualVideoPlayer = null;
   }
   if (journalsVideoPlayer && !journalsVideoPlayer.isDestroyed) {
     journalsVideoPlayer.destroy();
@@ -140,7 +140,7 @@ async function initializePageMedia(pageName, mediaItems, options, resizeConfig) 
 
     // Handle resize based on configuration
     if (resizeConfig.useEventResize) {
-      // Event-based resize (for Reptify, MEGAHERB, JOURNALS)
+      // Event-based resize (for Reptify, audiovisual, JOURNALS)
       const resizeHandler = createMediaResizeHandler(
         visualArea,
         { width: resizeConfig.maxWidth, height: resizeConfig.maxHeight }
@@ -281,10 +281,10 @@ function setFixedVisualAreaSize() {
     // Video aspect ratio size for Reptify - will be set by video initialization
     visualArea.style.height = '400px'; // Default, will be updated by video
     dynamicVisual.classList.add('reptify');
-  } else if (currentPage.includes('megaherb')) {
-    // Standard content size for Megaherb
+  } else if (currentPage.includes('audiovisual')) {
+    // Standard content size for audiovisual
     visualArea.style.height = '400px';
-    dynamicVisual.classList.add('megaherb');
+    dynamicVisual.classList.add('audiovisual');
   } else if (currentPage.includes('contact')) {
     // Contact page size
     visualArea.style.height = '400px';
@@ -395,15 +395,15 @@ document.querySelectorAll('.project').forEach((project, i) => {
             }
           }
           
-          // Special handling for MEGAHERB - show image slideshow
-          if (visualType === 'megaherb' && window.VideoPlayer) {
+          // Special handling for audiovisual - show image slideshow
+          if (visualType === 'audiovisual' && window.VideoPlayer) {
             try {
               destroyAllVideoPlayers();
               const videoContainer = createVideoContainer(dynamicVisual);
               const visualArea = document.querySelector('.visual-area');
 
-              megaherbVideoPlayer = await initializeMediaPlayer(
-                'megaherbVideoPlayer',
+              audiovisualVideoPlayer = await initializeMediaPlayer(
+                'audiovisualVideoPlayer',
                 videoContainer,
                 [
                   'assets/images/beta testing with cat.jpg',
@@ -415,7 +415,7 @@ document.querySelectorAll('.project').forEach((project, i) => {
                 createMediaResizeHandler(visualArea, { width: 0.9, height: 500 })
               );
             } catch (error) {
-              console.error('Error initializing MEGAHERB video player:', error);
+              console.error('Error initializing audiovisual video player:', error);
             }
           }
           
@@ -498,9 +498,9 @@ window.addEventListener('load', () => {
     initializeAttackVectorVideo();
   }
   
-  // Initialize video player for MEGAHERB page if we're on that page
-  if (!isIndexPage && window.location.pathname.includes('megaherb')) {
-    initializeMegaherbVideo();
+  // Initialize video player for audiovisual page if we're on that page
+  if (!isIndexPage && window.location.pathname.includes('audiovisual')) {
+    initializeaudiovisualVideo();
   }
 
   // Initialize video player for JOURNALS page if we're on that page
@@ -673,10 +673,10 @@ window.initializeReptifyVideo = async function initializeReptifyVideo() {
   );
 };
 
-// Function to initialize and auto-play image slideshow on megaherb page
-window.initializeMegaherbVideo = async function initializeMegaherbVideo() {
-  megaherbVideoPlayer = await initializePageMedia(
-    'megaherb',
+// Function to initialize and auto-play image slideshow on audiovisual page
+window.initializeaudiovisualVideo = async function initializeaudiovisualVideo() {
+  audiovisualVideoPlayer = await initializePageMedia(
+    'audiovisual',
     [
       'assets/images/beta testing with cat.jpg',
       'assets/images/building microphone.jpg',
