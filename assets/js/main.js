@@ -408,6 +408,11 @@ document.querySelectorAll('.project').forEach((project, i) => {
                 [
                   'assets/images/beta testing with cat.jpg',
                   'assets/images/building microphone.jpg',
+                  'assets/video/tober3small.mp4',
+                  'assets/video/tober12small.mp4',
+                  'assets/video/tober14small.mp4',
+                  'assets/video/tober15small.mp4',
+                  'assets/video/tober19small.mp4',
                   'assets/images/form acceptance.png',
                   'assets/images/microphone closeup.jpg'
                 ],
