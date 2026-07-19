@@ -1,6 +1,6 @@
 // Initialize project card hover effects and dynamic visual area
 let attackVectorVideoPlayer = null;
-let reptifyVideoPlayer = null;
+let appideoPlayer = null;
 let audiovisualVideoPlayer = null;
 let journalsVideoPlayer = null;
 
@@ -10,9 +10,9 @@ function destroyAllVideoPlayers() {
     attackVectorVideoPlayer.destroy();
     attackVectorVideoPlayer = null;
   }
-  if (reptifyVideoPlayer && !reptifyVideoPlayer.isDestroyed) {
-    reptifyVideoPlayer.destroy();
-    reptifyVideoPlayer = null;
+  if (appVideoPlayer && !appVideoPlayer.isDestroyed) {
+    appVideoPlayer.destroy();
+    appVideoPlayer = null;
   }
   if (audiovisualVideoPlayer && !audiovisualVideoPlayer.isDestroyed) {
     audiovisualVideoPlayer.destroy();
@@ -140,7 +140,7 @@ async function initializePageMedia(pageName, mediaItems, options, resizeConfig) 
 
     // Handle resize based on configuration
     if (resizeConfig.useEventResize) {
-      // Event-based resize (for Reptify, audiovisual, JOURNALS)
+      // Event-based resize (for app, audiovisual, JOURNALS)
       const resizeHandler = createMediaResizeHandler(
         visualArea,
         { width: resizeConfig.maxWidth, height: resizeConfig.maxHeight }
@@ -219,8 +219,8 @@ function resizeVisualArea(contentType = 'default', videoElement = null) {
         const hoveredProject = document.querySelector('.project-link:hover .project');
         let maxWidth, maxHeight;
         
-        if (hoveredProject && hoveredProject.getAttribute('data-visual') === 'reptify') {
-          // For Reptify, allow larger dimensions to accommodate the tall video
+        if (hoveredProject && hoveredProject.getAttribute('data-visual') === 'app') {
+          // For app, allow larger dimensions to accommodate the tall video
           maxWidth = containerWidth * 0.95; // 95% of container width
           maxHeight = Math.min(600, containerHeight * 0.9); // Max 90% of container height or 600px
         } else {
@@ -277,10 +277,10 @@ function setFixedVisualAreaSize() {
     // Video aspect ratio size for AttackVector
     visualArea.style.height = '338px'; // 16:9 aspect ratio for 600px width
     dynamicVisual.classList.add('attackvector');
-  } else if (currentPage.includes('reptify')) {
-    // Video aspect ratio size for Reptify - will be set by video initialization
+  } else if (currentPage.includes('app')) {
+    // Video aspect ratio size for apps - will be set by video initialization
     visualArea.style.height = '400px'; // Default, will be updated by video
-    dynamicVisual.classList.add('reptify');
+    dynamicVisual.classList.add('app');
   } else if (currentPage.includes('audiovisual')) {
     // Standard content size for audiovisual
     visualArea.style.height = '400px';
@@ -324,7 +324,7 @@ document.querySelectorAll('.project').forEach((project, i) => {
           // Resize visual area based on content type
           if (visualType === 'attackvector') {
             resizeVisualArea('content'); // Default resize until video loads
-          } else if (visualType === 'reptify') {
+          } else if (visualType === 'app') {
             resizeVisualArea('content'); // Default resize until video loads
           } else if (visualType === 'aeolis') {
             resizeVisualArea('image'); // Image content type for aeolis
@@ -368,15 +368,15 @@ document.querySelectorAll('.project').forEach((project, i) => {
             }
           }
           
-          // Special handling for Reptify - show mixed media
-          if (visualType === 'reptify' && window.VideoPlayer) {
+          // Special handling for app - show mixed media
+          if (visualType === 'app' && window.VideoPlayer) {
             try {
               destroyAllVideoPlayers();
               const videoContainer = createVideoContainer(dynamicVisual);
               const visualArea = document.querySelector('.visual-area');
 
-              reptifyVideoPlayer = await initializeMediaPlayer(
-                'reptifyVideoPlayer',
+              appVideoPlayer = await initializeMediaPlayer(
+                'appVideoPlayer',
                 videoContainer,
                 [
                   'assets/images/reptify loading screen.png',
@@ -388,10 +388,10 @@ document.querySelectorAll('.project').forEach((project, i) => {
                   'assets/video/biggener demo.mp4'
                 ],
                 { fadeDuration: 600, gapDuration: 200, loop: true, imageDuration: 1500 },
-                createMediaResizeHandler(visualArea, { width: 0.95, height: 600 }) // Reptify needs larger max height
+                createMediaResizeHandler(visualArea, { width: 0.95, height: 600 }) // app needs larger max height
               );
             } catch (error) {
-              console.error('Error initializing Reptify player:', error);
+              console.error('Error initializing app player:', error);
             }
           }
           
@@ -660,10 +660,10 @@ window.initializeAttackVectorVideo = async function initializeAttackVectorVideo(
   );
 };
 
-// Function to initialize and auto-play video on reptify page
-window.initializeReptifyVideo = async function initializeReptifyVideo() {
-  reptifyVideoPlayer = await initializePageMedia(
-    'reptify',
+// Function to initialize and auto-play video on app page
+window.initializeAppVideo = async function initializeAppVideo() {
+  appVideoPlayer = await initializePageMedia(
+    'app',
     [
       'assets/images/reptify loading screen.png',
       'assets/images/reptify sign in.png',

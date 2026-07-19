@@ -350,13 +350,13 @@ body::after { /* Noise Overlay */
   display: none; /* Hide text - video will play here */
 }
 
-.dynamic-visual.reptify {
+.dynamic-visual.app {
   background: #000000; /* Pure black for video overlay */
 }
-.dynamic-visual.reptify::before {
+.dynamic-visual.app::before {
   display: none; /* Remove pattern behind video */
 }
-.dynamic-visual.reptify .dynamic-visual-title { 
+.dynamic-visual.app .dynamic-visual-title { 
   color: var(--accent-success);
   text-shadow: 0 0 15px var(--accent-success);
 }
