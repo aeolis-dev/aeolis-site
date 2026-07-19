@@ -1,6 +1,6 @@
 // Initialize project card hover effects and dynamic visual area
 let attackVectorVideoPlayer = null;
-let appideoPlayer = null;
+let appVideoPlayer = null;
 let audiovisualVideoPlayer = null;
 let journalsVideoPlayer = null;
 
